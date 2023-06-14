@@ -1,12 +1,20 @@
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 /** @type {import('tailwindcss').Config} */
 export default {
+  //  This needs to change to include more specific patterns
+  // https://tailwindcss.com/docs/content-configuration
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'media',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+      },
+    },
   },
-  plugins: [],
-}
-
+  plugins: [require('@tailwindcss/typography'), require('@tailwindcss/forms')],
+};
