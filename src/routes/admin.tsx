@@ -1,0 +1,32 @@
+import { Suspense } from 'react';
+import { Outlet } from 'react-router-dom';
+
+import { Suspense as SuspenseFallback } from '@/components/Fallbacks';
+import { BaseLayout } from '@/components/Layout/BaseLayout';
+import { SYSTEM_ROLES } from '@/config/permissions';
+import { Dashboard } from '@/features/admin/components';
+import { RequirePoliciesRoute } from '@/lib/Authorization';
+
+type Props = NonNullable<unknown>;
+
+const App: React.FC<Props> = () => {
+  return (
+    <BaseLayout>
+      <Suspense fallback={<SuspenseFallback />}>
+        <Outlet />
+      </Suspense>
+    </BaseLayout>
+  );
+};
+
+export const routes = [
+  {
+    path: '/app/dashboard-admin',
+    element: (
+      <RequirePoliciesRoute allowedRoles={[SYSTEM_ROLES.SUPER_USER]}>
+        <App />
+      </RequirePoliciesRoute>
+    ),
+    children: [{ path: '', element: <Dashboard /> }],
+  },
+];
