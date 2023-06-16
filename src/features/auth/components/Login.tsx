@@ -2,13 +2,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { SYSTEM_ROLES } from '@/config/permissions';
 import Layout from '@/features/auth/layout/Layout';
-import { useAuth } from '@/hooks/useAuth';
 import axios from '@/lib/axios';
+import { useActions } from '@/stores/auth-slice';
 
 type Props = NonNullable<unknown>;
 
 export const Login: React.FC<Props> = () => {
-  const { setAuth } = useAuth();
+  const { setAccessToken, setSessionId } = useActions();
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -32,9 +32,9 @@ export const Login: React.FC<Props> = () => {
       const accessToken = response?.data?.accessToken;
       const sessionId = response?.data?.sessionId;
       const role = response?.data?.roleName;
-      const permissions = response?.data?.permissions;
 
-      setAuth({ accessToken, sessionId, role, permissions });
+      setAccessToken(accessToken);
+      setSessionId(sessionId);
 
       if (role === SYSTEM_ROLES.APPLICATION_USER)
         navigate(from || '/app/dashboard-employee', { replace: true });
