@@ -21,3 +21,9 @@ export class CustomError extends Error {
     return str;
   }
 }
+
+export type CustomErrorResponse = {
+  error: string;
+  message: string;
+  statusCode: number;
+};

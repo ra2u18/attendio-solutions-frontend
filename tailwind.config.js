@@ -11,6 +11,9 @@ export default {
   darkMode: 'media',
   theme: {
     extend: {
+      maxWidth: {
+        'custom-lg': '1120px'
+      },
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },

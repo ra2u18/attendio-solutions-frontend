@@ -1,8 +1,8 @@
 import Cookies from 'js-cookie';
 
 export const COOKIE_KEYS = {
-  ACCESS_TOKEN: 'token',
-  SESSION_ID: 'session_id',
+  ACCESS_TOKEN: 'token', // these can't be manipulated by JS -> http_only cookies
+  SESSION_ID: 'sessionId', // -> http_only cookies
 } as const;
 
 type KeyType = (typeof COOKIE_KEYS)[keyof typeof COOKIE_KEYS];
@@ -21,6 +21,8 @@ export const CookieService = {
   },
 
   clear: (): void => {
-    Object.keys(COOKIE_KEYS).map((key) => CookieService.remove(key as KeyType));
+    Object.values(COOKIE_KEYS).forEach((value) => {
+      CookieService.remove(value as KeyType);
+    });
   },
 };

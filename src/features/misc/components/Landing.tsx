@@ -1,5 +1,5 @@
 const Landing = () => {
-  return <div>Landing</div>;
+  return <div className="h-screen grid place-items-center text-[50px]">Landing Page</div>;
 };
 
 export default Landing;

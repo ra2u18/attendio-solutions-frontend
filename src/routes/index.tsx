@@ -1,29 +1,22 @@
 import { useRoutes } from 'react-router-dom';
 
+import { NotFound } from '@/components/Fallbacks';
 import { SYSTEM_ROLES } from '@/config/permissions';
-import Landing from '@/features/misc/components/Landing';
+import { useRoleAndPermissions } from '@/stores/auth-slice';
 
 import { routes as adminRoutes } from './admin';
+import { routes as publicWithRedirect } from './auth';
 import { routes as employeeRoutes } from './employees';
-import { routes as publicWithRedirect } from './public';
-
-// import { NotFound } from '@/components/Fallbacks';
+import { routes as commonRoutes } from './public';
 
 type Props = NonNullable<unknown>;
 
 export const AppRoutes: React.FC<Props> = () => {
-  const auth = { isAuthed: false, role: SYSTEM_ROLES.SUPER_USER }; // change this lated into proper authentication mechanism
+  const { role } = useRoleAndPermissions();
+  const fallbackRoute = { path: '*', element: <NotFound /> };
+  const routes = role === SYSTEM_ROLES.SUPER_USER ? adminRoutes : employeeRoutes;
 
-  const commonRoutes = [{ path: '/', element: <Landing /> }];
-  // const fallbackRoute = { path: '*', element: <NotFound /> };
-
-  const routes = auth.isAuthed
-    ? auth.role === SYSTEM_ROLES.SUPER_USER
-      ? adminRoutes
-      : employeeRoutes
-    : publicWithRedirect;
-
-  const element = useRoutes([...routes, ...commonRoutes]);
+  const element = useRoutes([...routes, ...commonRoutes, ...publicWithRedirect, fallbackRoute]);
 
   return <>{element}</>;
 };

@@ -9,7 +9,8 @@ const Layout: React.FC<Props> = ({ children, title }) => {
   return (
     <>
       <Head title={title} />
-      <div> {children} </div>
+
+      <div>{children}</div>
     </>
   );
 };

@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { SYSTEM_ROLES } from '@/config/permissions';
-import { useAuth } from '@/hooks/useAuth';
+import { useRoleAndPermissions } from '@/stores/auth-slice';
 
 type Props = {
   children: React.ReactNode;
@@ -10,17 +10,18 @@ type Props = {
 };
 
 export const RequirePoliciesRoute = ({ policyCheck, allowedRoles }: Props) => {
-  const auth = useAuth();
+  const { permissions, role, accessToken } = useRoleAndPermissions();
+
   const location = useLocation();
 
-  const userHasRequiredRole = allowedRoles?.includes(auth?.role);
-  const userHasRequiredPermission = auth?.permissions?.find((permission: string) =>
+  const userHasRequiredRole = allowedRoles?.includes(role);
+  const userHasRequiredPermission = permissions?.find((permission) =>
     policyCheck?.includes(permission)
   );
 
   return userHasRequiredRole || userHasRequiredPermission ? (
     <Outlet />
-  ) : auth?.accessToken ? (
+  ) : accessToken ? (
     <Navigate to="/unauthorized" state={{ from: location }} replace />
   ) : (
     <Navigate to="/auth/signin" state={{ from: location }} replace />
@@ -28,10 +29,10 @@ export const RequirePoliciesRoute = ({ policyCheck, allowedRoles }: Props) => {
 };
 
 export const RequireAccessChildren = ({ policyCheck, allowedRoles, children }: Props) => {
-  const auth = useAuth();
+  const { permissions, role } = useRoleAndPermissions();
 
-  const userHasRequiredRole = allowedRoles?.includes(auth?.role);
-  const userHasRequiredPermission = auth?.permissions?.find((permission: string) =>
+  const userHasRequiredRole = allowedRoles?.includes(role);
+  const userHasRequiredPermission = permissions?.find((permission) =>
     policyCheck?.includes(permission)
   );
 
@@ -39,14 +40,12 @@ export const RequireAccessChildren = ({ policyCheck, allowedRoles, children }: P
 };
 
 export const RedirectAuthedUser: React.FC<Props> = ({ children }) => {
-  const auth = useAuth();
-
-  console.log(auth);
+  const { accessToken, role } = useRoleAndPermissions();
 
   // Exit early if not authenticated
-  if (!auth.accessToken) return children;
+  if (!accessToken) return children;
 
-  switch (auth.role) {
+  switch (role) {
     case SYSTEM_ROLES.SUPER_USER:
       return <Navigate to="/app/dashboard-admin" replace />;
     case SYSTEM_ROLES.APPLICATION_USER:

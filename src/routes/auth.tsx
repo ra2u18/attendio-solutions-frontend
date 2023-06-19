@@ -3,9 +3,8 @@ import { Outlet } from 'react-router-dom';
 
 import { Suspense as SuspenseFallback } from '@/components/Fallbacks';
 import { BaseLayout } from '@/components/Layout/BaseLayout';
-import { SYSTEM_ROLES } from '@/config/permissions';
-import { Dashboard } from '@/features/employee/components';
-import { RequirePoliciesRoute } from '@/lib/Authorization';
+import { Login } from '@/features/auth/components';
+import { RedirectAuthedUser } from '@/lib/Authorization';
 
 type Props = NonNullable<unknown>;
 
@@ -21,12 +20,16 @@ const App: React.FC<Props> = () => {
 
 export const routes = [
   {
-    path: '/app/dashboard-employee',
+    path: '/auth',
     element: (
-      <RequirePoliciesRoute allowedRoles={[SYSTEM_ROLES.APPLICATION_USER]}>
+      <RedirectAuthedUser>
         <App />
-      </RequirePoliciesRoute>
+      </RedirectAuthedUser>
     ),
-    children: [{ path: '', element: <Dashboard /> }],
+    children: [
+      { path: 'signin', element: <Login /> },
+      // { path: 'forgot-password', element: <ForgotPassword /> },
+      // { path: 'verify-otp', element: <VerifyOTP /> }
+    ],
   },
 ];
