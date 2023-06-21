@@ -3,7 +3,9 @@ import { Outlet } from 'react-router-dom';
 
 import { Suspense as SuspenseFallback } from '@/components/Fallbacks';
 import { BaseLayout } from '@/components/Layout/BaseLayout';
-import Landing from '@/features/misc/components/Landing';
+import { lazyImport } from '@/utils/lazyImport';
+
+const { Landing } = lazyImport(() => import('@/features/misc'), 'Landing');
 
 type Props = NonNullable<unknown>;
 
