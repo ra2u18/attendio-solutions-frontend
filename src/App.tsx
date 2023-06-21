@@ -1,9 +1,11 @@
 import { AppProviders } from '@/providers/app';
 
+import { AppRoutes } from './routes';
+
 const App = () => {
   return (
     <AppProviders>
-      <h1>Hello there</h1>
+      <AppRoutes />
     </AppProviders>
   );
 };

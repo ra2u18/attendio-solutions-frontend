@@ -24,17 +24,19 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: keyof typeof variants;
   size?: keyof typeof sizes;
   isLoading?: boolean;
+  stretch?: boolean;
 } & IconProps;
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
-    type = 'button',
-    className = '',
-    variant = 'primary',
-    size = 'md',
-    isLoading = false,
     startIcon,
     endIcon,
+    size = 'md',
+    type = 'button',
+    variant = 'primary',
+    isLoading = false,
+    stretch = false,
+    className = '',
     ...props
   },
   ref
@@ -45,6 +47,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       className={clsx(
         'flex justify-center items-center border border-gray-300 disabled:opacity-70 disabled:cursor-not-allowed rounded-md shadow-sm font-medium focus:ouline-none hover:opacity-80',
+        stretch && 'w-full',
         variants[variant],
         sizes[size],
         className
