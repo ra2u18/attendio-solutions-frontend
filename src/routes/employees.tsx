@@ -4,8 +4,10 @@ import { Outlet } from 'react-router-dom';
 import { Suspense as SuspenseFallback } from '@/components/Fallbacks';
 import { BaseLayout } from '@/components/Layout/BaseLayout';
 import { SYSTEM_ROLES } from '@/config/permissions';
-import { Dashboard } from '@/features/employee/components';
 import { RequirePoliciesRoute } from '@/lib/Authorization';
+import { lazyImport } from '@/utils/lazyImport';
+
+const { Dashboard } = lazyImport(() => import('@/features/employee'), 'Dashboard');
 
 type Props = NonNullable<unknown>;
 

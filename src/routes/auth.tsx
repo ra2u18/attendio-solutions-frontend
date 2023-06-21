@@ -3,8 +3,10 @@ import { Outlet } from 'react-router-dom';
 
 import { Suspense as SuspenseFallback } from '@/components/Fallbacks';
 import { BaseLayout } from '@/components/Layout/BaseLayout';
-import { Login } from '@/features/auth/components';
 import { RedirectAuthedUser } from '@/lib/Authorization';
+import { lazyImport } from '@/utils/lazyImport';
+
+const { Login } = lazyImport(() => import('@/features/auth'), 'Login');
 
 type Props = NonNullable<unknown>;
 
