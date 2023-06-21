@@ -1,4 +1,6 @@
-import { useForm, type FieldValues, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { FloatingInput as Input, Button } from '@/components';
 
@@ -7,41 +9,48 @@ type Props = {
   isLoading: boolean;
 };
 
-export const LoginForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
+const verifyOTPSchema = z
+  .object({
+    password: z.string({ required_error: 'Password is a required field ' }),
+    confirmPassword: z.string({ required_error: 'Confirm Password is required ' }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+  });
+
+export const VerifyOTPForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FieldValues>({
-    defaultValues: { email: '', password: '', applicationId: '' },
+    defaultValues: {
+      password: '',
+      confirmPassword: '',
+    },
+    resolver: zodResolver(verifyOTPSchema),
   });
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <Input
-        label="Application"
-        id="applicationId"
-        register={register}
-        required
-        errors={errors}
-        disabled={isLoading}
-      />
-      <Input
-        label="Email"
-        id="email"
-        register={register}
-        required
-        errors={errors}
-        disabled={isLoading}
-      />
-      <Input
         label="Password"
         id="password"
-        type="password"
         register={register}
         required
         errors={errors}
         disabled={isLoading}
+        type="password"
+      />
+
+      <Input
+        label="Confirm Password"
+        id="confirmPassword"
+        register={register}
+        required
+        errors={errors}
+        disabled={isLoading}
+        type="password"
       />
 
       <div className="mt-10">
@@ -53,7 +62,7 @@ export const LoginForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
           isLoading={isLoading}
           stretch
         >
-          Sign In
+          Sign up
         </Button>
       </div>
     </form>

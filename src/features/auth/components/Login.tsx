@@ -3,10 +3,9 @@ import { SubmitHandler, FieldValues } from 'react-hook-form';
 import toaster from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Logo } from '@/components/Elements/Logo';
-import { LoginForm } from '@/components/Forms/LoginForm/LoginForm';
+import { LoginForm, Logo } from '@/components';
 import { SYSTEM_ROLES } from '@/config/permissions';
-import Layout from '@/features/auth/layout/Layout';
+import { Layout } from '@/features/auth';
 import { CustomError } from '@/lib/errors';
 import { useSetAccessToken, useSetSessionId } from '@/stores/auth-slice';
 import { LoginUserInput, LoginUserOutput } from '@/types/auth';
@@ -40,7 +39,6 @@ export const Login: React.FC<Props> = () => {
       onError: (err: CustomError) => {
         toaster.error('Could not log in');
         console.log('err', { err });
-        // toast the error, clear the fields, set retry counts after block
       },
     }
   );

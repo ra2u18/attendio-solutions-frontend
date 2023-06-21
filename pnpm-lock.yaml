@@ -4,6 +4,7 @@ specifiers:
   '@commitlint/config-conventional': ^17.6.5
   '@headlessui/react': ^1.7.15
   '@heroicons/react': ^2.0.18
+  '@hookform/resolvers': ^3.1.1
   '@storybook/addon-essentials': 7.0.20
   '@storybook/addon-interactions': 7.0.20
   '@storybook/addon-links': 7.0.20
@@ -62,11 +63,13 @@ specifiers:
   ts-jest: ^29.1.0
   typescript: ^5.0.2
   vite: ^4.3.9
+  zod: ^3.21.4
   zustand: ^4.3.8
 
 dependencies:
   '@headlessui/react': 1.7.15_biqbaboplfbrettd7655fr4n2y
   '@heroicons/react': 2.0.18_react@18.2.0
+  '@hookform/resolvers': 3.1.1_react-hook-form@7.44.3
   '@tanstack/react-query': 4.29.14_biqbaboplfbrettd7655fr4n2y
   '@tanstack/react-query-devtools': 4.29.14_qfglv7ytnoe5nvyimijxnr67iu
   '@testing-library/jest-dom': 5.16.5
@@ -85,6 +88,7 @@ dependencies:
   react-hook-form: 7.44.3_react@18.2.0
   react-hot-toast: 2.4.1_biqbaboplfbrettd7655fr4n2y
   react-router-dom: 6.13.0_biqbaboplfbrettd7655fr4n2y
+  zod: 3.21.4
   zustand: 4.3.8_react@18.2.0
 
 devDependencies:
@@ -2764,6 +2768,14 @@ packages:
       react: '>= 16'
     dependencies:
       react: 18.2.0
+    dev: false
+
+  /@hookform/resolvers/3.1.1_react-hook-form@7.44.3:
+    resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.44.3_react@18.2.0
     dev: false
 
   /@humanwhocodes/config-array/0.11.10:
@@ -10754,6 +10766,10 @@ packages:
   /yocto-queue/0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  /zod/3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+    dev: false
 
   /zustand/4.3.8_react@18.2.0:
     resolution: {integrity: sha512-4h28KCkHg5ii/wcFFJ5Fp+k1J3gJoasaIbppdgZFO4BPJnsNxL0mQXBSFgOgAdCdBj35aDTPvdAJReTMntFPGg==}

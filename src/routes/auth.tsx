@@ -7,6 +7,8 @@ import { RedirectAuthedUser } from '@/lib/Authorization';
 import { lazyImport } from '@/utils/lazyImport';
 
 const { Login } = lazyImport(() => import('@/features/auth'), 'Login');
+const { Register } = lazyImport(() => import('@/features/auth'), 'Register');
+const { VerifyOTP } = lazyImport(() => import('@/features/auth'), 'VerifyOTP');
 
 type Props = NonNullable<unknown>;
 
@@ -30,8 +32,9 @@ export const routes = [
     ),
     children: [
       { path: 'signin', element: <Login /> },
+      { path: 'signup', element: <Register /> },
+      { path: 'verify-otp', element: <VerifyOTP /> },
       // { path: 'forgot-password', element: <ForgotPassword /> },
-      // { path: 'verify-otp', element: <VerifyOTP /> }
     ],
   },
 ];

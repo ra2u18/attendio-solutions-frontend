@@ -1,5 +1,3 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-
 import { Spinner } from '@/components/Elements';
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
 import { useAccessToken, useLogout, useUser } from '@/stores/auth-slice';
@@ -11,8 +9,6 @@ export const Dashboard = () => {
   const axiosPrivate = useAxiosPrivate();
   const token = useAccessToken();
   const logout = useLogout();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const allUsers = useUsersByApplicationId({
     applicationId: user?.applicationId as string,
@@ -33,7 +29,6 @@ export const Dashboard = () => {
       <button
         onClick={() => {
           logout();
-          navigate('/', { state: location, replace: true });
         }}
       >
         logout
