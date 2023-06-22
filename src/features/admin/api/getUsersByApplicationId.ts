@@ -33,6 +33,5 @@ export const useUsersByApplicationId = ({
     enabled: !!config?.enabled,
     queryKey: ['users', 'all_users', applicationId],
     queryFn: () => getUsers(applicationId, axiosPrivate),
-    onError: (err) => console.log(err),
   });
 };

@@ -1,47 +1,16 @@
-import { useMutation } from '@tanstack/react-query';
 import { SubmitHandler, FieldValues } from 'react-hook-form';
-import toaster from 'react-hot-toast';
-import { useLocation, useNavigate } from 'react-router-dom';
 
-import { LoginForm, Logo } from '@/components';
-import { SYSTEM_ROLES } from '@/config/permissions';
+import { Alert, LoginForm, Logo, useAlert } from '@/components';
 import { Layout } from '@/features/auth';
-import { CustomError } from '@/lib/errors';
-import { useSetAccessToken, useSetSessionId } from '@/stores/auth-slice';
-import { LoginUserInput, LoginUserOutput } from '@/types/auth';
+import { LoginUserInput } from '@/types/auth';
 
-import { loginUserFn } from '../api';
+import { useLogin } from '../hooks/useLogin';
 
 type Props = NonNullable<unknown>;
 
 export const Login: React.FC<Props> = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname;
-
-  const setAccessToken = useSetAccessToken();
-  const setSessionId = useSetSessionId();
-
-  const { mutate: loginUser, isLoading } = useMutation(
-    (userData: LoginUserInput) => loginUserFn(userData),
-    {
-      onSuccess: async (data: LoginUserOutput) => {
-        const { accessToken, sessionId, role } = data;
-        // success toast
-        setAccessToken(accessToken);
-        setSessionId(sessionId);
-
-        if (role === SYSTEM_ROLES.APPLICATION_USER)
-          navigate(from || '/app/dashboard-employee', { replace: true });
-        else if (role === SYSTEM_ROLES.SUPER_USER)
-          navigate(from || '/app/dashboard-admin', { replace: true });
-      },
-      onError: (err: CustomError) => {
-        toaster.error('Could not log in');
-        console.log('err', { err });
-      },
-    }
-  );
+  const { alert, removeAlert } = useAlert();
+  const { mutate: loginUser, isLoading } = useLogin();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     loginUser(data as LoginUserInput);
@@ -58,6 +27,16 @@ export const Login: React.FC<Props> = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm md:max-w-lg">
+          {alert && (
+            <Alert
+              text={alert.text}
+              variant={alert.variant}
+              dismissNotification={() => removeAlert()}
+            >
+              {alert.children}
+            </Alert>
+          )}
+
           <LoginForm isLoading={isLoading} onSubmit={onSubmit} />
         </div>
       </div>

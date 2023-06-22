@@ -3,8 +3,6 @@ import { FieldValues, SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button, FloatingInput as Input } from '@/components';
-import { ErrorAlert } from '@/components/Alerts';
-import { useZodErrorsPretty } from '@/hooks/useZodErrorsPretty';
 
 const registerFormSchema = z.object({
   email: z
@@ -37,17 +35,8 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
     resolver: zodResolver(registerFormSchema),
   });
 
-  console.log(errors);
-  const errorMessages = useZodErrorsPretty(errors);
-
   return (
     <>
-      {errorMessages.length > 0 && (
-        <ErrorAlert
-          errors={errorMessages}
-          title={`There were ${errors.length} errors with your submission`}
-        />
-      )}
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Email"
@@ -75,14 +64,7 @@ export const RegisterForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
         />
 
         <div className="mt-10">
-          <Button
-            // onClick={() => reset()}
-            size="md"
-            type="submit"
-            variant="primary"
-            isLoading={isLoading}
-            stretch
-          >
+          <Button size="md" type="submit" variant="primary" isLoading={isLoading} stretch>
             Sign up
           </Button>
         </div>

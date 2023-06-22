@@ -5,3 +5,4 @@ export * from './Head';
 export * from './Inputs';
 export * from './Layout';
 export * from './Navbar';
+export * from './Alerts';

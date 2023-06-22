@@ -5,6 +5,7 @@ import { CustomError } from '@/lib/errors';
 import {
   AppRegisterInput,
   AppRegisterOutput,
+  ForgotPwdInput,
   LoginUserInput,
   LoginUserOutput,
   VerifyOTPInput,
@@ -59,3 +60,18 @@ export const verifyOTPFn = async (payload: VerifyOTPInput): Promise<void> => {
   if (response.status !== HttpStatusCode.Ok)
     throw new CustomError('Bad Request', HttpStatusCode.BadRequest);
 };
+
+export const forgotPwdFn = async (payload: ForgotPwdInput): Promise<void> => {
+  const response = await axios.post(
+    'users/forgot-password',
+    { ...payload },
+    {
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
+
+  if (response.status !== HttpStatusCode.Ok)
+    throw new CustomError('Bad Request', HttpStatusCode.BadRequest);
+};
+
+export * from './errorConstants';

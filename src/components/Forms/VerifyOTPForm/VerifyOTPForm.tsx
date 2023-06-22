@@ -11,11 +11,20 @@ type Props = {
 
 const verifyOTPSchema = z
   .object({
-    password: z.string({ required_error: 'Password is a required field ' }),
-    confirmPassword: z.string({ required_error: 'Confirm Password is required ' }),
+    password: z
+      .string({ required_error: 'Password is a required field' })
+      .refine((data) => data.trim() !== '', {
+        message: 'Password cannot be empty',
+      }),
+    confirmPassword: z
+      .string({ required_error: 'Confirm Password is required' })
+      .refine((data) => data.trim() !== '', {
+        message: 'Confirm Password cannot be empty',
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
+    path: ['confirmPassword'],
   });
 
 export const VerifyOTPForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
@@ -30,6 +39,8 @@ export const VerifyOTPForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
     },
     resolver: zodResolver(verifyOTPSchema),
   });
+
+  console.log(errors);
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>

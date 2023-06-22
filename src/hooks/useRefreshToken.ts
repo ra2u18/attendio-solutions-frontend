@@ -10,8 +10,6 @@ const useRefreshToken = () => {
   const logout = useLogout();
 
   const refresh = async (): Promise<string | undefined> => {
-    console.log('refresh activate');
-
     try {
       const response = await axios.post(
         'users/refresh-token',

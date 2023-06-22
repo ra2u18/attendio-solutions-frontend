@@ -45,3 +45,9 @@ export type VerifyOTPInput = {
   password: string;
   confirmPassword: string;
 };
+
+/** Forgot pwd types */
+export type ForgotPwdInput = {
+  email: string;
+  applicationId: string;
+};

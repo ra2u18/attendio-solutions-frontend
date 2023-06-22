@@ -33,7 +33,6 @@ const useAxiosPrivate = () => {
     const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
-        console.log('Run response intercept');
         const prevRequest = error?.config;
 
         if (notAuthorized(error.response.data) && !prevRequest?.sent) {
