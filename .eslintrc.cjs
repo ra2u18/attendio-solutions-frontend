@@ -36,12 +36,12 @@ module.exports = {
         'plugin:jest-dom/recommended',
       ],
       rules: {
-        // 'no-restricted-imports': [
-        //   'error',
-        //   {
-        //     patterns: ['@/features/*/*'],
-        //   },
-        // ],
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: ['@/features/*/*'],
+          },
+        ],
         'linebreak-style': ['error', 'unix'],
         'react/prop-types': 'off',
 
@@ -61,7 +61,14 @@ module.exports = {
 
         'jsx-a11y/anchor-is-valid': 'off',
 
-        '@typescript-eslint/no-unused-vars': ['error'],
+        '@typescript-eslint/no-unused-vars': [
+          "warn",
+          {
+            'argsIgnorePattern': '^_',
+            'varsIgnorePattern': '^_',
+            'caughtErrorsIgnorePattern': '^_'
+          }
+        ],
 
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/explicit-module-boundary-types': ['off'],

@@ -1,3 +1,5 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { createStore, StateCreator, StoreApi, useStore } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
@@ -10,6 +12,7 @@ import { UserState } from '@/types/auth';
 type State = {
   accessToken: string | undefined;
   sessionId: string | undefined;
+  isAuthenticated: boolean;
   user: UserState | undefined;
 };
 
@@ -34,6 +37,8 @@ const baseStore = (
   accessToken: undefined,
   user: undefined,
   sessionId: undefined,
+  isAuthenticated: false,
+
   setAccessToken: async (token: State['accessToken']) => {
     const accessTokenData = async () => {
       try {
@@ -85,6 +90,9 @@ const accessTokenSelector = (state: ExtractState<typeof authStore>) => state.acc
 const userSelector = (state: ExtractState<typeof authStore>) => state.user;
 const sessionIdSelector = (state: ExtractState<typeof authStore>) => state.sessionId;
 
+const isAuthenticatedSelector = (state: ExtractState<typeof authStore>) => {
+  return Boolean(state.accessToken && state.user);
+};
 const setAccessTokenSelector = (state: ExtractState<typeof authStore>) => state.setAccessToken;
 const setSessionIdSelector = (state: ExtractState<typeof authStore>) => state.setSessionId;
 const initSelector = (state: ExtractState<typeof authStore>) => state.init;
@@ -108,7 +116,25 @@ export const useSessionId = () => useAuthStore(sessionIdSelector);
 export const useSetAccessToken = () => useAuthStore(setAccessTokenSelector);
 export const useSetSessionId = () => useAuthStore(setSessionIdSelector);
 export const useInit = () => useAuthStore(initSelector);
-export const useLogout = () => useAuthStore(logoutSelector);
+
+// Will only recompute only if accessToken or user changes
+export const useIsAuthenticated = () => useAuthStore(isAuthenticatedSelector, shallow);
+
+export const useLogout = () => {
+  const logoutStore = useAuthStore(logoutSelector);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const queryClient = useQueryClient();
+
+  return async () => {
+    // Execute store logout function
+    logoutStore();
+
+    // Additional actions
+    navigate('/', { state: location, replace: true });
+    queryClient.clear();
+  };
+};
 
 // Shallow performs a shallow comparison between the previous and new state,
 // and if the specific properties that you've selected don't change

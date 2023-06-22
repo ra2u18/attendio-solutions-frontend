@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { SYSTEM_ROLES } from '@/config/permissions';
-import { useLogout, useUser } from '@/stores/auth-slice';
+import { useIsAuthenticated, useLogout, useUser } from '@/stores/auth-slice';
 
 import { Button } from '../Elements';
 import { Logo } from '../Elements/Logo';
@@ -18,6 +18,7 @@ const navigation = [
 
 export const Navbar = () => {
   const user = useUser();
+  const isAuthenticated = useIsAuthenticated();
   const logout = useLogout();
 
   const navigate = useNavigate();
@@ -68,16 +69,16 @@ export const Navbar = () => {
               </div>
               <div className="hidden lg:relative lg:z-10 lg:ml-4 lg:flex lg:items-center">
                 {/* Profile dropdown */}
-                {user ? (
+                {isAuthenticated ? (
                   <Menu as="div" className="relative ml-4 flex-shrink-0">
                     <div className="flex gap-2 items-center">
                       <Menu.Button className="flex rounded-full bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         <div className="h-8 w-8 rounded-full bg-indigo-100 grid place-items-center font-bold">
-                          {user.name.charAt(0).toUpperCase()}
+                          {user?.name.charAt(0).toUpperCase()}
                         </div>
                       </Menu.Button>
-                      <div className="text-base font-medium text-gray-800">{user.name}</div>
+                      <div className="text-base font-medium text-gray-800">{user?.name}</div>
                     </div>
                     <Transition
                       as={Fragment}
@@ -93,7 +94,7 @@ export const Navbar = () => {
                           {({ active }) => (
                             <Link
                               to={
-                                user.roleName === SYSTEM_ROLES.SUPER_USER
+                                user?.roleName === SYSTEM_ROLES.SUPER_USER
                                   ? '/app/admin-dashboard'
                                   : '/app/employee-dashboard'
                               }
@@ -133,7 +134,7 @@ export const Navbar = () => {
                       </Button>
                     )}
                     {location.pathname !== '/auth/signup' && (
-                      <Button onClick={() => navigate('#')}>Sign Up</Button>
+                      <Button onClick={() => navigate('/auth/signup')}>Sign Up</Button>
                     )}
                   </div>
                 )}
@@ -213,7 +214,7 @@ export const Navbar = () => {
                   </Button>
                 )}
                 {location.pathname !== '/auth/signup' && (
-                  <Button stretch onClick={() => navigate('#')}>
+                  <Button stretch onClick={() => navigate('/auth/signup')}>
                     Sign Up
                   </Button>
                 )}

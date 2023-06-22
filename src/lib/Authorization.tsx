@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { SYSTEM_ROLES } from '@/config/permissions';
-import { useRoleAndPermissions } from '@/stores/auth-slice';
+import { useIsAuthenticated, useRoleAndPermissions } from '@/stores/auth-slice';
 
 type Props = {
   children: React.ReactNode;
@@ -10,7 +10,8 @@ type Props = {
 };
 
 export const RequirePoliciesRoute = ({ policyCheck, allowedRoles }: Props) => {
-  const { permissions, role, accessToken } = useRoleAndPermissions();
+  const { permissions, role } = useRoleAndPermissions();
+  const isAuthenticated = useIsAuthenticated();
 
   const location = useLocation();
 
@@ -21,7 +22,7 @@ export const RequirePoliciesRoute = ({ policyCheck, allowedRoles }: Props) => {
 
   return userHasRequiredRole || userHasRequiredPermission ? (
     <Outlet />
-  ) : accessToken ? (
+  ) : isAuthenticated ? (
     <Navigate to="/unauthorized" state={{ from: location }} replace />
   ) : (
     <Navigate to="/auth/signin" state={{ from: location }} replace />
@@ -30,20 +31,22 @@ export const RequirePoliciesRoute = ({ policyCheck, allowedRoles }: Props) => {
 
 export const RequireAccessChildren = ({ policyCheck, allowedRoles, children }: Props) => {
   const { permissions, role } = useRoleAndPermissions();
+  const isAuthenticated = useIsAuthenticated();
 
   const userHasRequiredRole = allowedRoles?.includes(role);
   const userHasRequiredPermission = permissions?.find((permission) =>
     policyCheck?.includes(permission)
   );
 
-  return userHasRequiredRole || userHasRequiredPermission ? children : null;
+  return isAuthenticated && (userHasRequiredRole || userHasRequiredPermission) ? children : null;
 };
 
 export const RedirectAuthedUser: React.FC<Props> = ({ children }) => {
-  const { accessToken, role } = useRoleAndPermissions();
+  const { role } = useRoleAndPermissions();
+  const isAuthenticated = useIsAuthenticated();
 
   // Exit early if not authenticated
-  if (!accessToken) return children;
+  if (!isAuthenticated) return children;
 
   switch (role) {
     case SYSTEM_ROLES.SUPER_USER:

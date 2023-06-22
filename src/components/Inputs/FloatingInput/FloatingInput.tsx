@@ -53,12 +53,14 @@ export const FloatingInput: React.FC<Props> = ({
       <label
         htmlFor={id}
         className={clsx(
-          'absolute text-md duration-150 transform -translate-y-3 top-[18px] z-10 pl-4 left-4 origin-[0] peer-placeholder-shown:scale-100  peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:font-bold',
+          'absolute cursor-text text-md duration-150 transform -translate-y-3 top-[18px] z-10 pl-4 left-4 origin-[0] peer-placeholder-shown:scale-100  peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:font-bold',
           hasValue && 'scale-75 -translate-y-4 font-bold'
         )}
       >
         {label}
       </label>
+
+      {errors[id] && <p className="text-red-500 text-sm my-2">{errors[id]?.message?.toString()}</p>}
     </div>
   );
 };

@@ -1,28 +1,32 @@
-import { SubmitHandler, FieldValues } from 'react-hook-form';
+import { useEffect } from 'react';
+import { FieldValues, SubmitHandler } from 'react-hook-form';
 
-import { Alert, LoginForm, Logo, useAlert } from '@/components';
-import { Layout } from '@/features/auth';
-import { LoginUserInput } from '@/types/auth';
+import { Alert, Logo, RequestNewOTPForm, useAlert } from '@/components';
+import { Layout, REQUEST_OTP_ON_MOUNT } from '@/features/auth';
+import { ForgotPwdInput } from '@/types/auth';
 
-import { useLogin } from '../hooks/useLogin';
+import { useRefreshOTP } from '../hooks/useRefreshOTP';
 
 type Props = NonNullable<unknown>;
-
-export const Login: React.FC<Props> = () => {
-  const { alert, removeAlert } = useAlert();
-  const { mutate: loginUser, isLoading } = useLogin();
+export const RequestNewOTP: React.FC<Props> = () => {
+  const { alert, notify, removeAlert } = useAlert();
+  const { mutate: refreshOTP, isLoading } = useRefreshOTP();
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    loginUser(data as LoginUserInput);
+    refreshOTP(data as ForgotPwdInput);
   };
 
+  useEffect(() => {
+    notify({ text: REQUEST_OTP_ON_MOUNT, variant: 'success' });
+  }, []);
+
   return (
-    <Layout title="SignIn to your account">
+    <Layout title="Sign Up">
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <Logo className="mx-auto h-10 w-auto" />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
+            Request new OTP
           </h2>
         </div>
 
@@ -36,8 +40,7 @@ export const Login: React.FC<Props> = () => {
               {alert.children}
             </Alert>
           )}
-
-          <LoginForm isLoading={isLoading} onSubmit={onSubmit} />
+          <RequestNewOTPForm isLoading={isLoading} onSubmit={onSubmit} />
         </div>
       </div>
     </Layout>

@@ -5,7 +5,7 @@ type Props = {
   title: string;
 };
 
-const Layout: React.FC<Props> = ({ children, title }) => {
+export const Layout: React.FC<Props> = ({ children, title }) => {
   return (
     <>
       <Head title={title} />
@@ -14,5 +14,3 @@ const Layout: React.FC<Props> = ({ children, title }) => {
     </>
   );
 };
-
-export default Layout;
