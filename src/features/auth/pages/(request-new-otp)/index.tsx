@@ -2,10 +2,9 @@ import { useEffect } from 'react';
 import { FieldValues, SubmitHandler } from 'react-hook-form';
 
 import { Alert, Logo, RequestNewOTPForm, useAlert } from '@/components';
-import { Layout, REQUEST_OTP_ON_MOUNT } from '@/features/auth';
+import { Layout, useRefreshOTP } from '@/features/auth';
+import { REQUEST_OTP_ON_MOUNT } from '@/services/api/constants';
 import { ForgotPwdInput } from '@/types/auth';
-
-import { useRefreshOTP } from '../hooks/useRefreshOTP';
 
 type Props = NonNullable<unknown>;
 export const RequestNewOTP: React.FC<Props> = () => {

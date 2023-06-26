@@ -12,7 +12,7 @@ type Props = {
  */
 export const BaseLayout: React.FC<Props> = ({ children }) => {
   return (
-    <div className="py-6">
+    <div className="py-6 h-screen">
       <div className="mx-auto px-4 sm:px-6 md:px-8">
         <Navbar />
 

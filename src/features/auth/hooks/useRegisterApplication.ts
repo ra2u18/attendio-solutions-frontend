@@ -2,13 +2,9 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode } from 'axios';
 
 import { useAlert } from '@/components';
-import {
-  registerAppFn,
-  LOGIN_SUCCESS_MSG,
-  NETWORK_ERR_MSG,
-  REGISTER_APP_EXISTS,
-} from '@/features/auth';
 import { CustomErrorResponse } from '@/lib/errors';
+import { registerAppFn } from '@/services/api/(auth)';
+import { LOGIN_SUCCESS_MSG, NETWORK_ERR_MSG, REGISTER_APP_EXISTS } from '@/services/api/constants';
 import { AppRegisterInput } from '@/types/auth';
 
 export const useRegisterApplication = () => {

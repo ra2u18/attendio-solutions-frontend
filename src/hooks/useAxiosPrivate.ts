@@ -1,8 +1,8 @@
 import { HttpStatusCode } from 'axios';
 import { useEffect } from 'react';
 
-import { axiosPrivate } from '@/lib/axios';
 import { CustomErrorResponse } from '@/lib/errors';
+import { axiosPrivate } from '@/services/api/axios';
 import { useAccessToken } from '@/stores/auth-slice';
 
 import useRefreshToken from './useRefreshToken';

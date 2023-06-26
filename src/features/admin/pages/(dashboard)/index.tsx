@@ -1,8 +1,8 @@
 import { Spinner } from '@/components/Elements';
 import useAxiosPrivate from '@/hooks/useAxiosPrivate';
+import { useUsersByApplicationId } from '@/services/api/(admin)';
+import { socketService } from '@/services/socket/socket.service';
 import { useAccessToken, useLogout, useUser } from '@/stores/auth-slice';
-
-import { useUsersByApplicationId } from '../../api/getUsersByApplicationId';
 
 export const Dashboard = () => {
   const user = useUser();
@@ -33,6 +33,22 @@ export const Dashboard = () => {
       >
         logout
       </button>
+      <button
+        onClick={() => {
+          socketService.emitMessage('checkinEvent', 'checkin in is the best part');
+        }}
+      >
+        checkin
+      </button>
+
+      <button
+        onClick={() => {
+          socketService.emitMessage('checkoutEvent', 'checkout is the worse part');
+        }}
+      >
+        checkin
+      </button>
+
       <div>{JSON.stringify(allUsers.data)}</div>
     </>
   );

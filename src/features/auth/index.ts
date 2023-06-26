@@ -1,4 +1,3 @@
-export * from './components';
+export * from './pages';
 export * from './layout';
-export * from './api';
 export * from './hooks';

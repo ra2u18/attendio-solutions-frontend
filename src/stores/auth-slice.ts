@@ -4,9 +4,10 @@ import { createStore, StateCreator, StoreApi, useStore } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 
-import { axiosPrivate } from '@/lib/axios';
 import { COOKIE_KEYS, CookieService } from '@/lib/cookies';
 import { verifyAccessToken } from '@/lib/jwt';
+import { axiosPrivate } from '@/services/api/axios';
+import { socketService } from '@/services/socket/socket.service';
 import { UserState } from '@/types/auth';
 
 type State = {
@@ -50,6 +51,10 @@ const baseStore = (
 
     const userData = await accessTokenData();
 
+    if (userData && token) {
+      socketService.setupMainSocketConnection(token);
+    }
+
     set({ accessToken: token, user: userData });
   },
 
@@ -65,8 +70,9 @@ const baseStore = (
       await axiosPrivate.post('/users/logout', {}, { withCredentials: true });
     };
 
-    await _backendLogout();
-    set({ accessToken: undefined, user: undefined, sessionId: undefined });
+    await _backendLogout(); // Logout from backend
+    socketService.disconnectTenantSocket(); // Disconnect socket
+    set({ accessToken: undefined, user: undefined, sessionId: undefined }); // Clear state
   },
 });
 
