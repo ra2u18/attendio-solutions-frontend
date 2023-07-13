@@ -4,8 +4,8 @@ import { forwardRef } from 'react';
 import { Spinner } from '@/components/Elements/Spinner';
 
 const variants = {
-  primary: 'bg-blue-600 text-white',
-  inverse: 'bg-white text-blue-600',
+  primary: 'bg-indigo-600 text-white',
+  inverse: 'bg-white text-indigo-600',
   danger: 'bg-red-600 text-white',
 };
 

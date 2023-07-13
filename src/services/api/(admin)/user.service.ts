@@ -1,3 +1,8 @@
+/** Admin related api function handlers
+ *
+ * @dev These endpoints use the private axios instance,since they
+ * require authentication
+ */
 import { useQuery } from '@tanstack/react-query';
 import { AxiosInstance } from 'axios';
 

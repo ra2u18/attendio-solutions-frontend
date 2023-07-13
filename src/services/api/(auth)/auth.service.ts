@@ -1,7 +1,12 @@
+/** Authentication service api function handlers
+ *
+ * @dev These endpoints use the public axios instance,since they don't
+ * require authentication
+ */
 import { HttpStatusCode } from 'axios';
 
-import axios from '@/lib/axios';
 import { CustomError } from '@/lib/errors';
+import axios from '@/services/api/axios';
 import {
   AppRegisterInput,
   AppRegisterOutput,
@@ -73,5 +78,3 @@ export const forgotPwdFn = async (payload: ForgotPwdInput): Promise<void> => {
   if (response.status !== HttpStatusCode.Ok)
     throw new CustomError('Bad Request', HttpStatusCode.BadRequest);
 };
-
-export * from './errorConstants';

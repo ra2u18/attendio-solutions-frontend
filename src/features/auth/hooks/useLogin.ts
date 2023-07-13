@@ -4,13 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAlert } from '@/components';
 import { SYSTEM_ROLES } from '@/config/permissions';
-import {
-  NETWORK_ERR_MSG,
-  loginUserFn,
-  PASSWORD_NOT_SET,
-  INVALID_CREDENTIALS,
-} from '@/features/auth';
 import { CustomErrorResponse } from '@/lib/errors';
+import { loginUserFn } from '@/services/api/(auth)';
+import { NETWORK_ERR_MSG, PASSWORD_NOT_SET, INVALID_CREDENTIALS } from '@/services/api/constants';
 import { useSetAccessToken, useSetSessionId } from '@/stores/auth-slice';
 import { LoginUserInput, LoginUserOutput } from '@/types/auth';
 
@@ -26,7 +22,8 @@ export const useLogin = () => {
   return useMutation((userData: LoginUserInput) => loginUserFn(userData), {
     onSuccess: async (data: LoginUserOutput) => {
       const { accessToken, sessionId, role } = data;
-      // success toast
+
+      // Set state
       setAccessToken(accessToken);
       setSessionId(sessionId);
 

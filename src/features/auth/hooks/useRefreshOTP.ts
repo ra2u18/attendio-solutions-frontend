@@ -3,13 +3,13 @@ import { AxiosError, HttpStatusCode } from 'axios';
 import toast from 'react-hot-toast';
 
 import { useAlert } from '@/components';
+import { CustomErrorResponse } from '@/lib/errors';
+import { forgotPwdFn } from '@/services/api/(auth)';
 import {
   NETWORK_ERR_MSG,
-  forgotPwdFn,
   INVALID_CREDENTIALS,
   REQUEST_OTP_SUCCESS,
-} from '@/features/auth';
-import { CustomErrorResponse } from '@/lib/errors';
+} from '@/services/api/constants';
 import { ForgotPwdInput } from '@/types/auth';
 
 export const useRefreshOTP = () => {

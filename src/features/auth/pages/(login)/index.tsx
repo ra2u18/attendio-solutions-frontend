@@ -1,10 +1,8 @@
 import { SubmitHandler, FieldValues } from 'react-hook-form';
 
 import { Alert, LoginForm, Logo, useAlert } from '@/components';
-import { Layout } from '@/features/auth';
+import { Layout, useLogin } from '@/features/auth';
 import { LoginUserInput } from '@/types/auth';
-
-import { useLogin } from '../hooks/useLogin';
 
 type Props = NonNullable<unknown>;
 

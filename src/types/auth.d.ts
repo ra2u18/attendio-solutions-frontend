@@ -22,6 +22,7 @@ export type LoginUserOutput = {
   accessToken: string;
   sessionId: string;
   role: string;
+  applicationId: string;
 };
 
 /** Register app types */

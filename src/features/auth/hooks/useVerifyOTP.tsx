@@ -4,8 +4,9 @@ import toast from 'react-hot-toast';
 import { useNavigate, Link } from 'react-router-dom';
 
 import { useAlert } from '@/components';
-import { verifyOTPFn, NETWORK_ERR_MSG, OTP_EXPIRED_MSG } from '@/features/auth';
 import { CustomErrorResponse } from '@/lib/errors';
+import { verifyOTPFn } from '@/services/api/(auth)';
+import { NETWORK_ERR_MSG, OTP_EXPIRED_MSG } from '@/services/api/constants';
 import { VerifyOTPInput } from '@/types/auth';
 
 type Props = { variant: string };
@@ -46,7 +47,6 @@ export const useVerifyOTP = () => {
         customError.statusCode === HttpStatusCode.BadRequest &&
         customError.message === 'Invalid code'
       ) {
-        console.log('here');
         notify({
           text: OTP_EXPIRED_MSG,
           variant: 'warning',

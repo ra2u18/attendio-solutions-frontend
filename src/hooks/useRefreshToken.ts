@@ -1,7 +1,7 @@
 import { HttpStatusCode } from 'axios';
 
-import axios from '@/lib/axios';
 import { CustomError } from '@/lib/errors';
+import axios from '@/services/api/axios';
 import { useLogout, useSetAccessToken, useUser } from '@/stores/auth-slice';
 
 const useRefreshToken = () => {
