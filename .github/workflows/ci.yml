@@ -39,7 +39,7 @@ jobs:
           TMP_BUCKET_NAME: ${{ secrets.TMP_BUCKET_NAME }}
         run: |
           echo "Downloading utility scripts from AWS"
-          aws --region ${REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts
+          aws --region ${REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
 
       - name: Check if environment bucket exists
         id: bucket_exists
