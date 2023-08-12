@@ -66,7 +66,7 @@ jobs:
           chmod +x ~/tmp/scripts/env/utils.sh
           . ~/tmp/scripts/env/utils.sh
 
-          package_env_file
+          package_and_encrypt_env
 
 
   # www-infra:
