@@ -36,10 +36,10 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Download utility scripts from AWS
         env:
-          TMP_S3_BUCKET_NAME: ${{ secrets.TMP_S3_BUCKET_NAME }}
+          TMP_BUCKET_NAME: ${{ secrets.TMP_BUCKET_NAME }}
         run: |
           echo "Downloading utility scripts from AWS"
-          aws --region ${REGION} s3 cp s3://${TMP_S3_BUCKET_NAME}/backend/scripts ~/tmp/scripts
+          aws --region ${REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts
 
       - name: Check if environment bucket exists
         id: bucket_exists
