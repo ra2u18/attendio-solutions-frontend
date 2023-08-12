@@ -58,11 +58,15 @@ jobs:
           chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
           . ~/tmp/scripts/aws/query/extract-key-id.sh
       - name: Prepare Env to be uploaded
+        if: steps.bucket_exists.outcome == 'success' && steps.fetch_key_id.outcome == 'success'
         id: prepare_env
         env:
           ENV_KMS_KEY_ID: ${{ steps.fetch_key_id.outputs.KMS_KEY_ID }}
           ENV_S3_BUCKET_NAME: ${{ secrets.ENV_BUCKET_NAME }}
         run: |
+          apk update && apk add zip
+
+          echo "Environment KMS Key ID: ${{ steps.fetch_key_id.outputs.KMS_KEY_ID }}"
           chmod +x ~/tmp/scripts/env/utils.sh
           . ~/tmp/scripts/env/utils.sh
 
