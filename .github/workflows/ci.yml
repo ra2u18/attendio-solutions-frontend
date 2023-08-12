@@ -53,7 +53,7 @@ jobs:
       - name: Fetch KMS Key ID
         id: fetch_key_id
         env:
-          KMS_KEY_ALIAS: ${{ secrets.KMS_KEY_ALIAS }}
+          KMS_KEY_ALIAS: ${{ secrets.ENV_KMS_KEY_ALIAS }}
         run:
           chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
           . ~/tmp/scripts/aws/query/extract-key-id.sh
