@@ -1,0 +1,126 @@
+name: attendio-frontend-pipeline
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+on:
+  push:
+    branches: [ develop ]
+    paths:
+      - 'src/**'
+      - '.deploy/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  prep-env-file:
+    name: Zip and upload env file
+    runs-on: ubuntu-latest
+    environment: attendio-ci-stage
+    env:
+      REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      ENVIRONMENT: stage
+      CLIENT: frontend
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Download utility scripts from AWS
+        env:
+          TMP_S3_BUCKET_NAME: ${{ secrets.TMP_S3_BUCKET_NAME }}
+        run: |
+          echo "Downloading utility scripts from AWS"
+          aws --region ${REGION} s3 cp s3://${TMP_S3_BUCKET_NAME}/backend/scripts ~/tmp/scripts
+
+      - name: Check if environment bucket exists
+        id: bucket_exists
+        run: |
+          chmod +x ~/tmp/scripts/aws/query/does-bucket-exist.sh
+          . ~/tmp/scripts/aws/query/does-bucket-exist.sh
+
+          does_bucket_exist ${BUCKET_NAME}
+      - name: Fetch KMS Key ID
+        id: fetch_key_id
+        env:
+          KMS_KEY_ALIAS: ${{ secrets.KMS_KEY_ALIAS }}
+        run:
+          chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
+          . ~/tmp/scripts/aws/query/extract-key-id.sh
+      - name: Prepare Env to be uploaded
+        id: prepare_env
+        env:
+          ENV_KMS_KEY_ID: ${{ steps.fetch_key_id.outputs.KMS_KEY_ID }}
+          ENV_S3_BUCKET_NAME: ${{ secrets.ENV_BUCKET_NAME }}
+        run: |
+          chmod +x ~/tmp/scripts/env/utils.sh
+          . ~/tmp/scripts/env/utils.sh
+
+          package_env_file
+
+
+  # www-infra:
+  #   name: Provision Webserver AWS Infrastructure
+  #   runs-on: ubuntu-latest
+  #   environment: attendio-ci-stage
+  #   defaults:
+  #     run:
+  #       working-directory: .deploy/terraform/stage/services/frontend
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         ref: feat-added-socket-io
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v2
+  #       with:
+  #         terraform_wrapper: false
+  #     - name: Terraform validate
+  #       id: tf_validate
+  #       run: |
+  #         terraform fmt -check
+  #         terraform validate 
+  #     - name: Terraform plan and apply
+  #       id: init  
+  #       run: |
+  #         terraform init
+  #         terraform workspace select stage || terraform workspace new stage
+  #     - name: Terraform Plan
+  #       id: plan
+  #       # if: github.event_name == 'pull_request'
+  #       run: |
+  #         terraform workspace select stage
+  #         terraform plan -no-color -input=false
+  #       continue-on-error: true
+  #     - name: Terraform Plan Status
+  #       if: steps.plan.outcome == 'failure'
+  #       run: exit 1
+  #     - name: Terraform Apply
+  #       id: apply
+  #       # if: github.event_name == 'push'
+  #       run: |
+  #         terraform workspace select stage
+  #         terraform apply -auto-approve
+  #         cloudfront_id=$(terraform output -raw cloudfront_distribution_id)
+  #         echo "::set-output name=cloudfront_id::${cloudfront_id}"
+  #     - name: "Upload build to S3"
+  #       run: |
+          
+  #         aws s3 sync ./build s3://attendio-frontend-stage --delete
+          
+  #     - name: AWS cloudfront distribution
+  #       run: |
+  #         echo "Cloudfront distribution id: ${{ steps.apply.outputs.cloudfront_id }}"
