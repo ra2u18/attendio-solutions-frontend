@@ -43,6 +43,8 @@ jobs:
 
       - name: Check if environment bucket exists
         id: bucket_exists
+        env:
+          BUCKET_NAME: ${{ secrets.ENV_BUCKET_NAME }}
         run: |
           chmod +x ~/tmp/scripts/aws/query/does-bucket-exist.sh
           . ~/tmp/scripts/aws/query/does-bucket-exist.sh
