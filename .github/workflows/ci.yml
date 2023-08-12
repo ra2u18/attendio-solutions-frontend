@@ -54,7 +54,10 @@ jobs:
         id: fetch_key_id
         env:
           KMS_KEY_ALIAS: ${{ secrets.ENV_KMS_KEY_ALIAS }}
-        run:
+        run: |
+          ls -la ~/tmp/scripts/aws/query
+          echo "Fetching KMS Key ID for alias: ${KMS_KEY_ALIAS}"
+
           chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
           . ~/tmp/scripts/aws/query/extract-key-id.sh
       - name: Prepare Env to be uploaded
@@ -71,7 +74,6 @@ jobs:
           . ~/tmp/scripts/env/utils.sh
 
           package_and_encrypt_env
-
 
   # www-infra:
   #   name: Provision Webserver AWS Infrastructure
