@@ -67,7 +67,7 @@ jobs:
           ENV_KMS_KEY_ID: ${{ steps.fetch_key_id.outputs.KMS_KEY_ID }}
           ENV_S3_BUCKET_NAME: ${{ secrets.ENV_BUCKET_NAME }}
         run: |
-          apk update && apk add zip
+          ls -la
 
           echo "Environment KMS Key ID: ${{ steps.fetch_key_id.outputs.KMS_KEY_ID }}"
           chmod +x ~/tmp/scripts/env/utils.sh
