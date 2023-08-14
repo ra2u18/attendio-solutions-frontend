@@ -192,59 +192,59 @@ jobs:
 workflows:
   build_and_deploy:
     jobs:
-      - install-dependencies
-      - linting:
-          requires:
-            - install-dependencies
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
-      - code-formatter-check:
-          requires:
-            - install-dependencies
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
-      - fetch-utilities:
-          context: << pipeline.git.branch >>
-          requires:
-            - linting
-            - code-formatter-check
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
-      - fetch-kms-key-id:
-          context: << pipeline.git.branch >>
-          requires:
-            - fetch-utilities
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
-      - prepare-env:
-          context: << pipeline.git.branch >>
-          requires:
-            - fetch-kms-key-id
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
-      - terraform-validate:
-          requires:
-            - prepare-env
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
+      # - install-dependencies
+      # - linting:
+      #     requires:
+      #       - install-dependencies
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
+      # - code-formatter-check:
+      #     requires:
+      #       - install-dependencies
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
+      # - fetch-utilities:
+      #     context: << pipeline.git.branch >>
+      #     requires:
+      #       - linting
+      #       - code-formatter-check
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
+      # - fetch-kms-key-id:
+      #     context: << pipeline.git.branch >>
+      #     requires:
+      #       - fetch-utilities
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
+      # - prepare-env:
+      #     context: << pipeline.git.branch >>
+      #     requires:
+      #       - fetch-kms-key-id
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
+      # - terraform-validate:
+      #     requires:
+      #       - prepare-env
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
       - terraform-plan-and-apply:
           context: << pipeline.git.branch >>
           requires:
@@ -254,12 +254,12 @@ workflows:
               only:
                 - stage
                 - main
-      - upload-build-to-s3:
-          context: << pipeline.git.branch >>
-          requires:
-            - terraform-plan-and-apply
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
+      # - upload-build-to-s3:
+      #     context: << pipeline.git.branch >>
+      #     requires:
+      #       - terraform-plan-and-apply
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
