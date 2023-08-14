@@ -18,18 +18,20 @@ aliases:
       name: Show current branch name
       command: echo "Current branch name is $CIRCLE_BRANCH"
   - &restore-cache
-    keys:
-      - app-{{ checksum "package.json" }}
-      - app-
+    restore_cache:
+      keys:
+        - app-{{ checksum "package.json" }}
+        - app-
   - &install-dependencies
     run:
       name: Install dependencies
       command: pnpm install
   - &save-cache
-    run:
-      paths:
-        - node_modules
-      key: app-{{ checksum "package.json" }}
+    save_cache:
+      run:
+        paths:
+          - node_modules
+        key: app-{{ checksum "package.json" }}
 
 jobs:
   install-dependencies:
