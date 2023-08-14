@@ -64,9 +64,9 @@ jobs:
     executor: app-executor
     steps:
       - aws-cli/setup:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-          region: $AWS_DEFAULT_REGION
+          aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+          aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+          region: ${AWS_DEFAULT_REGION}
       - run: 
           name: Download utility scripts from AWS
           command: |
@@ -82,9 +82,9 @@ jobs:
       - attach_workspace:
           at: ~/tmp/scripts
       - aws-cli/setup:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-          region: $AWS_DEFAULT_REGION
+          aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+          aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+          region: ${AWS_DEFAULT_REGION}
       - run:
           name: Run fetch-kms-key-id script
           command: |
@@ -132,9 +132,9 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup:
-          aws_access_key_id: $AWS_ACCESS_KEY_ID
-          aws_secret_access_key: $AWS_SECRET_ACCESS_KEY
-          region: $AWS_DEFAULT_REGION
+          aws_access_key_id: ${AWS_ACCESS_KEY_ID}
+          aws_secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+          region: ${AWS_DEFAULT_REGION}
       - *restore-cache
       - run:
           name: Export the S3 bucket name to an environment variable
