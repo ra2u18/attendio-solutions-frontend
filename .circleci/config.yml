@@ -89,7 +89,8 @@ jobs:
           name: Run extract-key-id.sh script
           command: |
             export REGION=${AWS_DEFAULT_REGION}
-            
+            export KMS_KEY_ALIAS=${KMS_KEY_ALIAS}
+
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
