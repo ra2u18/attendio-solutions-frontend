@@ -1,6 +1,7 @@
+version: 2.1
+
 orbs:
   aws-cli: circleci/aws-cli@4.0.0
-version: 2.1
 executors:
   app-executor:
     docker:
@@ -177,7 +178,7 @@ workflows:
                 - stage
                 - main
       - fetch-utilities:
-          context: stage
+          context: $CIRCLE_BRANCH
           requires:
             - linting
             - code-formatter-check
@@ -187,7 +188,7 @@ workflows:
                 - stage
                 - main
       - fetch-kms-key-id:
-          context: stage
+          context: $CIRCLE_BRANCH
           requires:
             - fetch-utilities
           filters:  
