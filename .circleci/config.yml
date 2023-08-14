@@ -1,0 +1,26 @@
+orbs:
+  aws-cli: circleci/aws-cli@4.0.0
+version: 2.1
+executors:
+  app-executor:
+    docker:
+      - image: cimg/node:20.5.1
+      - image: cimg/base:2023.08
+    terraform:
+      - image: hashicorp/terraform:latest
+      - image: cimg/base:2023.08
+    working_directory: ~/repo
+
+aliases:
+  - &show-current-branch-name
+    run:
+      name: Show current branch name
+      command: echo "Current branch name is $CIRCLE_BRANCH"
+  - &restore-cache
+    keys:
+      - app-{{ checksum "package.json" }}
+      - app-
+  - &install-dependencies
+    run:
+      name: Install dependencies
+      command: pnpm install
