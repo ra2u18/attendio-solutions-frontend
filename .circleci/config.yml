@@ -84,12 +84,13 @@ jobs:
           aws-access-key-id: $AWS_ACCESS_KEY_ID
           aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
           aws-default-region: $AWS_DEFAULT_REGION
-      - name: Run fetch-kms-key-id script
-        run: |
-          chmod +x ~/tmp/scripts/aws/query/fetch-kms-key-id.sh
-          . ~/tmp/scripts/fetch-kms-key-id.sh
-          
-          echo 'Exported KMS Key id ${KMS_KEY_ID} to an environment variable'
+      - run:
+          name: Run fetch-kms-key-id script
+          command: |
+            chmod +x ~/tmp/scripts/aws/query/fetch-kms-key-id.sh
+            . ~/tmp/scripts/fetch-kms-key-id.sh
+            
+            echo 'Exported KMS Key id ${KMS_KEY_ID} to an environment variable'
 
   terraform-validate:
     executor: terraform-executor
@@ -136,7 +137,7 @@ jobs:
       - *restore-cache
       - run:
           name: Export the S3 bucket name to an environment variable
-          run: export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
+          command: export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
           
 
   terraform-destroy:
