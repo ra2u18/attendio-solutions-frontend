@@ -92,7 +92,7 @@ jobs:
             export KMS_KEY_ALIAS=${KMS_KEY_ALIAS}
 
             echo "KMS_KEY_ALIAS is: ${KMS_KEY_ALIAS}"
-            
+
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
@@ -177,7 +177,7 @@ workflows:
                 - stage
                 - main
       - fetch-utilities:
-          context: $CIRCLE_BRANCH
+          context: stage
           requires:
             - linting
             - code-formatter-check
@@ -187,7 +187,7 @@ workflows:
                 - stage
                 - main
       - fetch-kms-key-id:
-          context: $CIRCLE_BRANCH
+          context: stage
           requires:
             - fetch-utilities
           filters:  
