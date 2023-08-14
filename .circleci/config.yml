@@ -52,7 +52,7 @@ jobs:
           name: Run linting
           command: pnpm run lint:check
   code-formatter-check:
-    executior: app-executor
+    executor: app-executor
     steps:
       - checkout
       - *show-current-branch-name
@@ -94,17 +94,17 @@ jobs:
           root: ~/tmp
           paths:
             - outputs
-    terraform-destroy:
-      executor: terraform-executor
-      steps:
-        - checkout
-        - *show-current-branch-name
-        - run:
-            name: Terraform destroy
-            command: |
-              terraform init
-              terraform workspace select stage || terraform workspace new stage
-              terraform destroy -auto-approve
+  terraform-destroy:
+    executor: terraform-executor
+    steps:
+      - checkout
+      - *show-current-branch-name
+      - run:
+          name: Terraform destroy
+          command: |
+            terraform init
+            terraform workspace select stage || terraform workspace new stage
+            terraform destroy -auto-approve
 
 workflows:
   build_and_deploy:
