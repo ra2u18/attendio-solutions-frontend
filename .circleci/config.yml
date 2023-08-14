@@ -111,14 +111,12 @@ jobs:
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
           region: ${AWS_DEFAULT_REGION}
       - run:
-          name: Import KMS_KEY_ID
+          name: Encrypt env variables and push them to AWS
           command: |
             export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
             export ENVIRONMENT=${CIRCLE_BRANCH}
             export CLIENT=frontend
-      - run:
-          name: Encrypt env variables and push them to AWS
-          command: |
+
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
