@@ -178,7 +178,7 @@ workflows:
                 - stage
                 - main
       - fetch-utilities:
-          context: $CIRCLE_BRANCH
+          context: << pipeline.git.branch >>
           requires:
             - linting
             - code-formatter-check
@@ -188,7 +188,7 @@ workflows:
                 - stage
                 - main
       - fetch-kms-key-id:
-          context: $CIRCLE_BRANCH
+          context: << pipeline.git.branch >>
           requires:
             - fetch-utilities
           filters:  
