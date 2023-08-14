@@ -119,7 +119,7 @@ workflows:
                 - develop
                 - stage
                 - main
-      - code-formatter-check
+      - code-formatter-check:
           requires:
             - install-dependencies
           filters:  
@@ -128,7 +128,7 @@ workflows:
                 - develop
                 - stage
                 - main
-      - terraform-validate
+      - terraform-validate:
           requires:
             - linting
             - code-formatter-check
