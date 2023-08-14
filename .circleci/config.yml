@@ -75,7 +75,7 @@ jobs:
             export BUCKET=${TMP_BUCKET_NAME}
 
             echo 'Downloading utility scripts from AWS'
-            aws --region ${REGION} s3 cp s3://${BUCKET}/backend/scripts ~/tmp/scripts --recursive
+            aws --region eu-central-1 s3 cp s3://${BUCKET}/backend/scripts ~/tmp/scripts --recursive
       - persist_to_workspace:
           root: ~/tmp
           paths:
