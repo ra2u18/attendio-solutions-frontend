@@ -67,10 +67,11 @@ jobs:
           aws-access-key-id: $AWS_ACCESS_KEY_ID
           aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
           aws-default-region: $AWS_DEFAULT_REGION
-      - name: Download utility scripts from AWS
-        command: |
-          echo 'Downloading utility scripts from AWS'
-          aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
+      - run: 
+          name: Download utility scripts from AWS
+          command: |
+            echo 'Downloading utility scripts from AWS'
+            aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
       - persist_to_workspace:
           root: ~/tmp
           paths:
