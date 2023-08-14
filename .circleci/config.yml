@@ -91,6 +91,8 @@ jobs:
             export REGION=${AWS_DEFAULT_REGION}
             export KMS_KEY_ALIAS=${KMS_KEY_ALIAS}
 
+            echo "KMS_KEY_ALIAS is: ${KMS_KEY_ALIAS}"
+            
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
@@ -142,8 +144,6 @@ jobs:
       - run:
           name: Export the S3 bucket name to an environment variable
           command: export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
-          
-
   terraform-destroy:
     executor: terraform-executor
     steps:
