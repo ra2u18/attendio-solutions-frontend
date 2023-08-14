@@ -71,11 +71,8 @@ jobs:
       - run: 
           name: Download utility scripts from AWS
           command: |
-            export REGION=${AWS_DEFAULT_REGION}
-            export BUCKET=${TMP_BUCKET_NAME}
-
             echo 'Downloading utility scripts from AWS'
-            aws --region eu-central-1 s3 cp s3://${BUCKET}/backend/scripts ~/tmp/scripts --recursive
+            aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
       - persist_to_workspace:
           root: ~/tmp
           paths:
@@ -94,8 +91,6 @@ jobs:
           command: |
             export REGION=${AWS_DEFAULT_REGION}
             export KMS_KEY_ALIAS=${KMS_KEY_ALIAS}
-
-            echo "KMS_KEY_ALIAS is: ${KMS_KEY_ALIAS}"
 
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
