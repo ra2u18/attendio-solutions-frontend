@@ -185,6 +185,8 @@ jobs:
       - run:
           name: Terraform destroy
           command: |
+            ls -la
+
             terraform init
             terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH
             terraform destroy -auto-approve
@@ -247,8 +249,8 @@ workflows:
       #           - main
       - terraform-plan-and-apply:
           context: << pipeline.git.branch >>
-          requires:
-            - terraform-validate
+          # requires:
+          #   - terraform-validate
           filters:  
             branches:
               only:
