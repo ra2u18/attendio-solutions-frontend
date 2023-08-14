@@ -114,7 +114,7 @@ jobs:
           name: Import KMS_KEY_ID
           command: |
             export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
-            export ENVIRONMENT=$CIRCLE_BRANCH
+            export ENVIRONMENT=${CIRCLE_BRANCH}
             export CLIENT=frontend
       - run:
           name: Encrypt env variables and push them to AWS
