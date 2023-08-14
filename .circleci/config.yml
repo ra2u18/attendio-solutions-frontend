@@ -72,7 +72,7 @@ jobs:
           name: Download utility scripts from AWS
           command: |
             echo 'Downloading utility scripts from AWS'
-            aws s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
+            aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
       - persist_to_workspace:
           root: ~/tmp
           paths:
