@@ -3,6 +3,7 @@ import axios from 'axios';
 export let BASE_ENDPOINT = '';
 const env = import.meta.env.VITE_APP_ENVIRONMENT;
 
+// TODO: change the BASE_ENDPOINT to your backend domain
 if (env === 'local') {
   BASE_ENDPOINT = 'http://localhost:5000';
 } else if (env === 'development') {
