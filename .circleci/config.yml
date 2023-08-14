@@ -121,6 +121,8 @@ jobs:
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
+            ls -la
+
             package_and_encrypt_env
 
   terraform-validate:
