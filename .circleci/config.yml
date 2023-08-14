@@ -12,7 +12,7 @@ executors:
     docker:
       - image: hashicorp/terraform:latest
       - image: cimg/base:2023.08
-    working_directory: ~/repo/.deploy/terraform/$CIRCLE_BRANCH/services/frontend # TODO: change stage to $CIRLCLE_BRANCH
+    working_directory: ~/repo/.deploy/terraform/$CIRCLE_BRANCH/services/frontend
 
 aliases:
   - &show-current-branch-name
@@ -33,6 +33,24 @@ aliases:
       paths:
         - node_modules
       key: app-{{ checksum "package.json" }}
+  - &connect-to-aws:
+    aws-cli/setup:
+      aws_access_key_id: AWS_ACCESS_KEY_ID
+      aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+      region: ${AWS_DEFAULT_REGION}
+  - &persist-outputs
+    persist_to_workspace:
+      root: ~/tmp
+      paths:
+        - outputs
+  - &persist-scripts
+    persist_to_workspace:
+      root: ~/tmp
+      paths:
+        - scripts
+  - &attach-to-tmp:
+    attach_workspace:
+      at: ~/tmp
 
 jobs:
   install-dependencies:
@@ -47,7 +65,6 @@ jobs:
     executor: app-executor
     steps:
       - checkout
-      - *show-current-branch-name
       - *restore-cache
       - run:
           name: Run linting
@@ -56,7 +73,6 @@ jobs:
     executor: app-executor
     steps:
       - checkout
-      - *show-current-branch-name
       - *restore-cache
       - run:
           name: Run code formatter check
@@ -64,72 +80,55 @@ jobs:
   fetch-utilities:
     executor: app-executor
     steps:
-      - aws-cli/setup:
-          aws_access_key_id: AWS_ACCESS_KEY_ID
-          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-          region: ${AWS_DEFAULT_REGION}
+      - *connect-to-aws
       - run: 
           name: Download utility scripts from AWS
           command: |
             echo 'Downloading utility scripts from AWS'
             aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
-      - persist_to_workspace:
-          root: ~/tmp
-          paths:
-            - scripts
+      - *persist-scripts
   fetch-kms-key-id:
     executor: app-executor
     steps:
-      - attach_workspace:
-          at: ~/tmp
-      - aws-cli/setup:
-          aws_access_key_id: AWS_ACCESS_KEY_ID
-          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-          region: ${AWS_DEFAULT_REGION}
+      - *attach-to-tmp
+      - *connect-to-aws
       - run:
           name: Run extract-key-id.sh script
           command: |
             export REGION=${AWS_DEFAULT_REGION}
-            export KMS_KEY_ALIAS=${KMS_KEY_ALIAS}
 
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
             mkdir -p ~/tmp/outputs
             echo ${KMS_KEY_ID} > ~/tmp/outputs/kms_key_id.txt
-      - persist_to_workspace:
-          root: ~/tmp
-          paths:
-            - outputs
+      - *persist-outputs
   prepare-env:
     executor: app-executor
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/tmp
-      - aws-cli/setup:
-          aws_access_key_id: AWS_ACCESS_KEY_ID
-          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-          region: ${AWS_DEFAULT_REGION}
+      - *restore-cache
+      - *connect-to-aws
+      - *attach-to-tmp
       - run:
           name: Encrypt env variables and push them to AWS
           command: |
+            # Setup required variables for the scripts to run successfully
             export CLIENT=frontend
             export REGION=${AWS_DEFAULT_REGION}
             export ENVIRONMENT=${CIRCLE_BRANCH}
             export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
-            export ENV_S3_BUCKET_NAME=${ENV_S3_BUCKET_NAME}
 
-            ENCRYPTED_S3_PATH="s3://${ENV_S3_BUCKET_NAME}/${CLIENT}/${ENVIRONMENT}/env-file.zip.encrypted"
-            echo ${ENCRYPTED_S3_PATH}
-
+            # Download utility scripts from AWS
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
+            # Change .env.local to match environment needs 
             PROPERTIES_TO_MODIFY="VITE_JWT_ACCESS_TOKEN_SECRET,VITE_APP_ENVIRONMENT,SERVER_URL"
             NEW_VALUES="${VITE_JWT_ACCESS_TOKEN_SECRET},${CIRCLE_BRANCH},${SERVER_URL}"
-
             modify_properties ${PROPERTIES_TO_MODIFY} ${NEW_VALUES}
+
+            # Encrypt .env.local and push it to AWS
             package_and_encrypt_env
 
   terraform-validate:
@@ -147,7 +146,6 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
-      - run: mkdir -p ~/tmp/outputs
       - run:
           name: Terraform plan and apply
           command: |
@@ -162,22 +160,23 @@ jobs:
 
             terraform output cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
             terraform output www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
-      - persist_to_workspace:
-          root: ~/tmp
-          paths:
-            - outputs
+      - *persist-outputs
   upload-build-to-s3:
     executor: app-executor
     steps:
       - checkout
-      - aws-cli/setup:
-          aws_access_key_id: AWS_ACCESS_KEY_ID
-          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
-          region: AWS_DEFAULT_REGION
+      - *connect-to-aws
       - *restore-cache
+      - *attach-to-tmp
       - run:
           name: Export the S3 bucket name to an environment variable
           command: export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
+      - run:
+          name: Upload build to S3
+          command: |
+            rm -rf dist
+            pnpm run build
+            aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://${S3_BUCKET_NAME}/${CIRCLE_BRANCH}/www --recursive
   terraform-destroy:
     executor: terraform-executor
     steps:
@@ -238,13 +237,29 @@ workflows:
               only:
                 - stage
                 - main
-      # - terraform-validate:
-      #     requires:
-      #       - linting
-      #       - code-formatter-check
-      #     filters:  
-      #       branches:
-      #         only:
-      #           - stage
-      #           - main
-            
+      - terraform-validate:
+          requires:
+            - prepare-env
+          filters:  
+            branches:
+              only:
+                - stage
+                - main
+      - terraform-plan-and-apply:
+          context: << pipeline.git.branch >>
+          requires:
+            - terraform-validate
+          filters:  
+            branches:
+              only:
+                - stage
+                - main
+      - upload-build-to-s3:
+          context: << pipeline.git.branch >>
+          requires:
+            - terraform-plan-and-apply
+          filters:  
+            branches:
+              only:
+                - stage
+                - main
