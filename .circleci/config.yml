@@ -95,7 +95,33 @@ jobs:
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
-            echo 'Exported KMS Key id ${KMS_KEY_ID} to an environment variable'
+            cat "${KMS_KEY_ID}" > ~/tmp/outputs/kms_key_id.txt
+      - persist_to_workspace:
+          root: ~/tmp
+          paths:
+            - outputs
+  prepare-env:
+    executor: app-executor
+    steps:
+      - attach_workspace:
+          at: ~/tmp
+      - aws-cli/setup:
+          aws_access_key_id: AWS_ACCESS_KEY_ID
+          aws_secret_access_key: AWS_SECRET_ACCESS_KEY
+          region: ${AWS_DEFAULT_REGION}
+      - run:
+          name: Import KMS_KEY_ID
+          command: |
+            export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
+            export ENVIRONMENT=$CIRCLE_BRANCH
+            export CLIENT=frontend
+      - run:
+          name: Encrypt env variables and push them to AWS
+          command: |
+            chmod +x ~/tmp/scripts/env/utils.sh
+            . ~/tmp/scripts/env/utils.sh
+
+            package_and_encrypt_env
 
   terraform-validate:
     executor: terraform-executor
