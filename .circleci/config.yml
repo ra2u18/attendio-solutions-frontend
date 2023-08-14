@@ -88,10 +88,8 @@ jobs:
       - run:
           name: Run extract-key-id.sh script
           command: |
-
-            ls -la ~/tmp/scripts/aws/query
-            ls -la ~/tmp/scripts
-
+            export REGION=${AWS_DEFAULT_REGION}
+            
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
