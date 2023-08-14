@@ -28,10 +28,9 @@ aliases:
       command: pnpm install
   - &save-cache
     save_cache:
-      run:
-        paths:
-          - node_modules
-        key: app-{{ checksum "package.json" }}
+      paths:
+        - node_modules
+      key: app-{{ checksum "package.json" }}
 
 jobs:
   install-dependencies:
