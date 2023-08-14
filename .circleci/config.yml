@@ -149,6 +149,8 @@ jobs:
       - run:
           name: Terraform plan and apply
           command: |
+            ls -la
+            
             terraform init
             terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH  
             terraform plan
@@ -185,8 +187,6 @@ jobs:
       - run:
           name: Terraform destroy
           command: |
-            ls -la
-
             terraform init
             terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH
             terraform destroy -auto-approve
