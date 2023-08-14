@@ -86,10 +86,10 @@ jobs:
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
           region: AWS_DEFAULT_REGION
       - run:
-          name: Run fetch-kms-key-id script
+          name: Run extract-key-id.sh script
           command: |
-            chmod +x ~/tmp/scripts/aws/query/fetch-kms-key-id.sh
-            . ~/tmp/scripts/fetch-kms-key-id.sh
+            chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh.sh
+            . ~/tmp/scripts/extract-key-id.sh.sh
             
             echo 'Exported KMS Key id ${KMS_KEY_ID} to an environment variable'
 
