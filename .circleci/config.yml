@@ -122,8 +122,10 @@ jobs:
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
-            ls -la
+            PROPERTIES_TO_MODIFY="VITE_JWT_ACCESS_TOKEN_SECRET,VITE_APP_ENVIRONMENT,SERVER_URL"
+            NEW_VALUES="${JWT_ACCESS_TOKEN_SECRET},${CIRCLE_BRANCH},${SERVER_URL}"
 
+            modify_properties ${PROPERTIES_TO_MODIFY} ${NEW_VALUES}
             package_and_encrypt_env
 
   terraform-validate:
