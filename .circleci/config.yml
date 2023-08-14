@@ -25,7 +25,7 @@ aliases:
   - &install-dependencies
     run:
       name: Install dependencies
-      command: pnpm install
+      command: pnpm install --no-frozen-lockfile
   - &save-cache
     save_cache:
       paths:
