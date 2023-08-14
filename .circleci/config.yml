@@ -88,8 +88,12 @@ jobs:
       - run:
           name: Run extract-key-id.sh script
           command: |
+
+            ls -la ~/tmp/scripts/aws/query
+            ls -la ~/tmp/scripts
+
             chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
-            . ~/tmp/scripts/extract-key-id.sh
+            . ~/tmp/scripts/aws/query/extract-key-id.sh
             
             echo 'Exported KMS Key id ${KMS_KEY_ID} to an environment variable'
 
