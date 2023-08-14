@@ -120,6 +120,9 @@ jobs:
             export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
             export ENV_S3_BUCKET_NAME=${ENV_S3_BUCKET_NAME}
 
+            ENCRYPTED_S3_PATH="s3://${ENV_S3_BUCKET_NAME}/${CLIENT}/${ENVIRONMENT}/env-file.zip.encrypted"
+            echo ${ENCRYPTED_S3_PATH}
+
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
