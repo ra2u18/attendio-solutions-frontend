@@ -69,11 +69,11 @@ jobs:
           aws_secret_access_key: AWS_SECRET_ACCESS_KEY
           region: AWS_DEFAULT_REGION
       - run:
-        name: Debug Print AWS Variables
-        command: |
-          echo $AWS_ACCESS_KEY_ID
-          echo $AWS_SECRET_ACCESS_KEY
-          echo $AWS_DEFAULT_REGION
+          name: Debug Print AWS Variables
+          command: |
+            echo $AWS_ACCESS_KEY_ID
+            echo $AWS_SECRET_ACCESS_KEY
+            echo $AWS_DEFAULT_REGION
       - run: 
           name: Download utility scripts from AWS
           command: |
