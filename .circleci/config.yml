@@ -11,7 +11,7 @@ executors:
     docker:
       - image: hashicorp/terraform:latest
       - image: cimg/base:2023.08
-    working_directory: ~/repo/.deploy/terraform/stage/services/frontend # TODO: change stage to $CIRLCLE_BRANCH
+    working_directory: ~/repo/.deploy/terraform/$CIRCLE_BRANCH/services/frontend # TODO: change stage to $CIRLCLE_BRANCH
 
 aliases:
   - &show-current-branch-name
@@ -60,6 +60,37 @@ jobs:
       - run:
           name: Run code formatter check
           command: pnpm run prettier:check
+  fetch-utilities:
+    executor: app-executor
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: $AWS_ACCESS_KEY_ID
+          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+          aws-default-region: $AWS_DEFAULT_REGION
+      - name: Download utility scripts from AWS
+        command: |
+          echo 'Downloading utility scripts from AWS'
+          aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
+      - persist_to_workspace:
+          root: ~/tmp
+          paths:
+            - scripts
+  fetch-kms-key-id:
+    executor: app-executor
+    steps:
+      - attach_workspace:
+          at: ~/tmp/scripts
+      - aws-cli/setup:
+          aws-access-key-id: $AWS_ACCESS_KEY_ID
+          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+          aws-default-region: $AWS_DEFAULT_REGION
+      - name: Run fetch-kms-key-id script
+        run: |
+          chmod +x ~/tmp/scripts/aws/query/fetch-kms-key-id.sh
+          . ~/tmp/scripts/fetch-kms-key-id.sh
+          
+          echo 'Exported KMS Key id ${KMS_KEY_ID} to an environment variable'
+
   terraform-validate:
     executor: terraform-executor
     steps:
@@ -68,7 +99,6 @@ jobs:
       - run:
           name: Terraform validate and format
           command: |
-            # TODO: change stage to $CIRLCLE_BRANCH
             terraform init -backend=false
             terraform validate && terraform fmt
   terraform-plan-and-apply:
@@ -81,19 +111,34 @@ jobs:
           name: Terraform plan and apply
           command: |
             terraform init
-            # TODO: Change stage to $CIRCLE_BRANCH
-            terraform workspace select stage || terraform workspace new stage  
+            terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH  
             terraform plan
       - run:
           name: Terraform apply
           command: |
-            terraform workspace select stage
+            terraform workspace select $CIRCLE_BRANCH
             terraform apply -auto-approve
+
             terraform output cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
+            terraform output www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
       - persist_to_workspace:
           root: ~/tmp
           paths:
             - outputs
+  upload-build-to-s3:
+    executor: app-executor
+    steps:
+      - checkout
+      - aws-cli/setup:
+          aws-access-key-id: $AWS_ACCESS_KEY_ID
+          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+          aws-default-region: $AWS_DEFAULT_REGION
+      - *restore-cache
+      - run:
+          name: Export the S3 bucket name to an environment variable
+          run: export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
+          
+
   terraform-destroy:
     executor: terraform-executor
     steps:
@@ -103,7 +148,7 @@ jobs:
           name: Terraform destroy
           command: |
             terraform init
-            terraform workspace select stage || terraform workspace new stage
+            terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH
             terraform destroy -auto-approve
 
 workflows:
@@ -116,7 +161,6 @@ workflows:
           filters:  
             branches:
               only:
-                - develop
                 - stage
                 - main
       - code-formatter-check:
@@ -125,17 +169,34 @@ workflows:
           filters:  
             branches:
               only:
-                - develop
                 - stage
                 - main
-      - terraform-validate:
+      - fetch-utilities:
+          context: $CIRCLE_BRANCH
           requires:
             - linting
             - code-formatter-check
           filters:  
             branches:
               only:
-                - develop
                 - stage
                 - main
+      - fetch-kms-key-id:
+          context: $CIRCLE_BRANCH
+          requires:
+            - fetch-utilities
+          filters:  
+            branches:
+              only:
+                - stage
+                - main
+      # - terraform-validate:
+      #     requires:
+      #       - linting
+      #       - code-formatter-check
+      #     filters:  
+      #       branches:
+      #         only:
+      #           - stage
+      #           - main
             
