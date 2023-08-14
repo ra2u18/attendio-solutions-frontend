@@ -113,9 +113,10 @@ jobs:
       - run:
           name: Encrypt env variables and push them to AWS
           command: |
-            export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
-            export ENVIRONMENT=${CIRCLE_BRANCH}
             export CLIENT=frontend
+            export REGION=${AWS_DEFAULT_REGION}
+            export ENVIRONMENT=${CIRCLE_BRANCH}
+            export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
 
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
