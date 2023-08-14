@@ -96,7 +96,7 @@ jobs:
             . ~/tmp/scripts/aws/query/extract-key-id.sh
             
             mkdir -p ~/tmp/outputs
-            cat "${KMS_KEY_ID}" > ~/tmp/outputs/kms_key_id.txt
+            echo ${KMS_KEY_ID} > ~/tmp/outputs/kms_key_id.txt
       - persist_to_workspace:
           root: ~/tmp
           paths:
