@@ -220,6 +220,15 @@ workflows:
               only:
                 - stage
                 - main
+      - prepare-env:
+          context: << pipeline.git.branch >>
+          requires:
+            - fetch-kms-key-id
+          filters:  
+            branches:
+              only:
+                - stage
+                - main
       # - terraform-validate:
       #     requires:
       #       - linting
