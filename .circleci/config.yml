@@ -11,6 +11,7 @@ executors:
     docker:
       - image: hashicorp/terraform:latest
       - image: cimg/base:2023.08
+    working_directory: ~/repo/.deploy/terraform/stage/services/frontend # TODO: change stage to $CIRLCLE_BRANCH
 
 aliases:
   - &show-current-branch-name
@@ -41,8 +42,100 @@ jobs:
       - *restore-cache
       - *install-dependencies
       - *save-cache
+  linting:
+    executor: app-executor
+    steps:
+      - checkout
+      - *show-current-branch-name
+      - *restore-cache
+      - run:
+          name: Run linting
+          command: pnpm run lint:check
+  code-formatter-check:
+    executior: app-executor
+    steps:
+      - checkout
+      - *show-current-branch-name
+      - *restore-cache
+      - run:
+          name: Run code formatter check
+          command: pnpm run prettier:check
+  terraform-validate:
+    executor: terraform-executor
+    steps:
+      - checkout
+      - *show-current-branch-name
+      - run:
+          name: Terraform validate and format
+          command: |
+            # TODO: change stage to $CIRLCLE_BRANCH
+            terraform init -backend=false
+            terraform validate && terraform fmt
+  terraform-plan-and-apply:
+    executor: terraform-executor
+    steps:
+      - checkout
+      - *show-current-branch-name
+      - run: mkdir -p ~/tmp/outputs
+      - run:
+          name: Terraform plan and apply
+          command: |
+            terraform init
+            # TODO: Change stage to $CIRCLE_BRANCH
+            terraform workspace select stage || terraform workspace new stage  
+            terraform plan
+      - run:
+          name: Terraform apply
+          command: |
+            terraform workspace select stage
+            terraform apply -auto-approve
+            terraform output cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
+      - persist_to_workspace:
+          root: ~/tmp
+          paths:
+            - outputs
+    terraform-destroy:
+      executor: terraform-executor
+      steps:
+        - checkout
+        - *show-current-branch-name
+        - run:
+            name: Terraform destroy
+            command: |
+              terraform init
+              terraform workspace select stage || terraform workspace new stage
+              terraform destroy -auto-approve
 
 workflows:
   build_and_deploy:
     jobs:
       - install-dependencies
+      - linting:
+          requires:
+            - install-dependencies
+          filters:  
+            branches:
+              only:
+                - develop
+                - stage
+                - main
+      - code-formatter-check
+          requires:
+            - install-dependencies
+          filters:  
+            branches:
+              only:
+                - develop
+                - stage
+                - main
+      - terraform-validate
+          requires:
+            - linting
+            - code-formatter-check
+          filters:  
+            branches:
+              only:
+                - develop
+                - stage
+                - main
+            
