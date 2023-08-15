@@ -151,6 +151,10 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
+      - run:
+          name: something
+          command: |
+            ls -la 
       - *cd-infra-dir
       - run:
           name: Terraform plan and apply
