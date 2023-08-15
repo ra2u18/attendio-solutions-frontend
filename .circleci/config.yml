@@ -159,6 +159,8 @@ jobs:
       - run:
           name: Terraform apply
           command: |
+            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
+
             terraform workspace select $CIRCLE_BRANCH
             terraform apply -auto-approve
 
