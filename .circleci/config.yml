@@ -36,7 +36,7 @@ aliases:
   - &cd-infra-dir
     run:
       name: Change directory to infra
-      command: cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
+      command: cd .deploy/terraform/${CIRCLE_BRANCH}/services/frontend
   - &connect-to-aws
     aws-cli/setup:
       aws_access_key_id: AWS_ACCESS_KEY_ID
