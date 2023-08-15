@@ -9,3 +9,4 @@ module "fe_stage" {
   prefix         = var.prefix
   env_app_domain = var.env_app_domain
 }
+

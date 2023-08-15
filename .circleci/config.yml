@@ -195,7 +195,7 @@ jobs:
             cat .env.local
       - run:
           name: Upload build to S3
-          command: | 
+          command: |
             export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
             aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://${S3_BUCKET_NAME}/${CIRCLE_BRANCH}/www --recursive
   terraform-destroy:
