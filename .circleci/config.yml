@@ -175,13 +175,28 @@ jobs:
       - *restore-cache
       - *attach-to-tmp
       - run:
-          name: Export the S3 bucket name to an environment variable
-          command: export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
+          name: Build the project
+          command: |
+            # Prepare local files
+            rm -rf dist .env.local
+            pnpm run build
+      - run:
+          name: Download .env.local from AWS and decrypt
+          command: |
+            export CLIENT=frontend
+            export REGION=${AWS_DEFAULT_REGION}
+            export ENVIRONMENT=${CIRCLE_BRANCH}
+            export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
+
+            . ~/tmp/scripts/env/utils.sh
+            fetch_env
+
+            echo 'Downloaded .env.local from AWS'
+            cat .env.local
       - run:
           name: Upload build to S3
-          command: |
-            rm -rf dist
-            pnpm run build
+          command: | 
+            export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
             aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://${S3_BUCKET_NAME}/${CIRCLE_BRANCH}/www --recursive
   terraform-destroy:
     executor: terraform-executor
