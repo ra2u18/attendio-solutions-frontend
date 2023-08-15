@@ -12,7 +12,7 @@ executors:
     docker:
       - image: hashicorp/terraform:latest
       - image: cimg/base:2023.08
-    working_directory: ~/repo/.deploy/terraform/$CIRCLE_BRANCH/services/frontend
+    # working_directory: ~/repo/.deploy/terraform/$CIRCLE_BRANCH/services/frontend
 
 aliases:
   - &show-current-branch-name
@@ -33,6 +33,10 @@ aliases:
       paths:
         - node_modules
       key: app-{{ checksum "package.json" }}
+  - &cd-infra-dir
+    run:
+      name: Change directory to infra
+      command: cd ~/repo/.deploy/terraform/$CIRCLE_BRANCH/services/frontend
   - &connect-to-aws
     aws-cli/setup:
       aws_access_key_id: AWS_ACCESS_KEY_ID
@@ -136,6 +140,7 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
+      - *cd-infra-dir
       - run:
           name: Terraform validate and format
           command: |
@@ -146,11 +151,12 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
+      - *cd-infra-dir
       - run:
           name: Terraform plan and apply
           command: |
             ls -la
-            
+
             terraform init
             terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH  
             terraform plan
@@ -184,6 +190,7 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
+      - *cd-infra-dir
       - run:
           name: Terraform destroy
           command: |
