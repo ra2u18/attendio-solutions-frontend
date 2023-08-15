@@ -36,7 +36,7 @@ aliases:
   - &cd-infra-dir
     run:
       name: Change directory to infra
-      command: cd .deploy/terraform/${CIRCLE_BRANCH}/services/frontend
+      command: cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
   - &connect-to-aws
     aws-cli/setup:
       aws_access_key_id: AWS_ACCESS_KEY_ID
@@ -151,10 +151,11 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
-      - *cd-infra-dir
+      # - *cd-infra-dir
       - run:
           name: Terraform plan and apply
           command: |
+            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
             ls -la
 
             terraform init
@@ -163,11 +164,11 @@ jobs:
       - run:
           name: Terraform apply
           command: |
-            terraform workspace select $CIRCLE_BRANCH
-            terraform apply -auto-approve
+            # terraform workspace select $CIRCLE_BRANCH
+            # terraform apply -auto-approve
 
-            terraform output cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
-            terraform output www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
+            # terraform output cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
+            # terraform output www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
       - *persist-outputs
   upload-build-to-s3:
     executor: app-executor
