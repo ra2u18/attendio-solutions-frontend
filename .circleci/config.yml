@@ -186,10 +186,11 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
-      - *cd-infra-dir
       - run:
           name: Terraform destroy
           command: |
+            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
+
             terraform init
             terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH
             terraform destroy -auto-approve
