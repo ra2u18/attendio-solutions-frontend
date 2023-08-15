@@ -164,8 +164,8 @@ jobs:
             terraform workspace select $CIRCLE_BRANCH
             terraform apply -auto-approve
 
-            terraform output cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
-            terraform output www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
+            terraform output -raw cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
+            terraform output -raw www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
       - *persist-outputs
   upload-build-to-s3:
     executor: app-executor
