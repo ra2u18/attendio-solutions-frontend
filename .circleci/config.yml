@@ -151,7 +151,7 @@ jobs:
     steps:
       - checkout
       - *show-current-branch-name
-      # - *cd-infra-dir
+      - *attach-to-tmp
       - run:
           name: Terraform plan and apply
           command: |
