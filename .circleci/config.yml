@@ -50,13 +50,6 @@ aliases:
   - &attach-to-tmp
     attach_workspace:
       at: ~/tmp
-  - &install-utils
-    run:
-      name: Install utilities
-      command: |
-        which bash || (apk update && apk add bash)
-        which zip || (apk update && apk add zip)
-        apk update && apk add coreutils
 jobs:
   install-dependencies:
     executor: app-executor
@@ -97,7 +90,6 @@ jobs:
     steps:
       - *attach-to-tmp
       - *connect-to-aws
-      - *install-utils
       - run:
           name: Run extract-key-id.sh script
           shell: /bin/bash
@@ -143,7 +135,6 @@ jobs:
       - *restore-cache
       - *connect-to-aws
       - *attach-to-tmp
-      - *install-utils
       - run:
           name: Encrypt env variables and push them to AWS
           shell: /bin/bash
