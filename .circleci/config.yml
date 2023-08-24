@@ -110,7 +110,7 @@ jobs:
 
             # Get the target key ID for the found alias
             key_id=$(aws kms describe-key \
-              --key-id "alias/${alias_name}" \
+              --key-id "${alias_name}" \
               --query "KeyMetadata.KeyId" \
               --output text)
 
@@ -119,6 +119,10 @@ jobs:
               --key-id "$key_id" \
               --query "KeyMetadata.KeyState" \
               --output text)
+
+            echo "Alias Name: ${alias_name}"
+            echo "Key ID: ${key_id}"
+
 
             # Check if the key is enabled
             if [ "$key_status" == "Enabled" ]; then
