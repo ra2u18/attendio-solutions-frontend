@@ -109,20 +109,19 @@ jobs:
             fi
 
             # Get the target key ID for the found alias
-            key_id=$(aws kms describe-key \
+            key_id=$(aws kms --region ${AWS_DEFAULT_REGION} describe-key \
               --key-id "${alias_name}" \
               --query "KeyMetadata.KeyId" \
               --output text)
 
             # Get the key status
-            key_status=$(aws kms describe-key \
+            key_status=$(aws kms --region ${AWS_DEFAULT_REGION} describe-key \
               --key-id "$key_id" \
               --query "KeyMetadata.KeyState" \
               --output text)
 
             echo "Alias Name: ${alias_name}"
             echo "Key ID: ${key_id}"
-
 
             # Check if the key is enabled
             if [ "$key_status" == "Enabled" ]; then
