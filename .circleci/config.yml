@@ -186,6 +186,8 @@ jobs:
       - run:
           name: Build the project
           command: |
+            cat .env.local
+
             # Prepare local files
             rm -rf dist .env.local
             pnpm run build

@@ -10,6 +10,8 @@ if (env === 'local') {
   BASE_ENDPOINT = 'https://api.dev.<your-backend-domain>';
 } else if (env === 'production') {
   BASE_ENDPOINT = 'https://api.prod.<your-backend-domain>';
+} else if (env === 'stage') {
+  BASE_ENDPOINT = 'https://api.stage.attendiosolutions.online';
 }
 
 const BASE_URL = `${BASE_ENDPOINT}/api/v1`;
