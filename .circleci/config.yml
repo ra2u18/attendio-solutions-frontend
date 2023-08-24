@@ -50,7 +50,13 @@ aliases:
   - &attach-to-tmp
     attach_workspace:
       at: ~/tmp
-
+  - &install-utils
+    run:
+      name: Install utilities
+      command: |
+        which bash || (apk update && apk add bash)
+        which zip || (apk update && apk add zip)
+        apk update && apk add coreutils
 jobs:
   install-dependencies:
     executor: app-executor
@@ -91,16 +97,44 @@ jobs:
     steps:
       - *attach-to-tmp
       - *connect-to-aws
+      - *install-utils
       - run:
           name: Run extract-key-id.sh script
+          shell: /bin/bash
           command: |
             export REGION=${AWS_DEFAULT_REGION}
 
-            chmod +x ~/tmp/scripts/aws/query/extract-key-id.sh
-            . ~/tmp/scripts/aws/query/extract-key-id.sh
+            alias_name=$(aws --region ${REGION} kms list-aliases \
+              --query "Aliases[?starts_with(AliasName, 'alias/attendio-env-fe')].AliasName" \
+              --output text)
+
+            # Exit if no alias matches the pattern
+            if [ -z "$alias_name" ]; then
+              echo "No KMS key found with the specified alias pattern."
+              exit 1
+            fi
+
+            # Get the target key ID for the found alias
+            key_id=$(aws kms describe-key \
+              --key-id "alias/${alias_name}" \
+              --query "KeyMetadata.KeyId" \
+              --output text)
+
+            # Get the key status
+            key_status=$(aws kms describe-key \
+              --key-id "$key_id" \
+              --query "KeyMetadata.KeyState" \
+              --output text)
+
+            # Check if the key is enabled
+            if [ "$key_status" == "Enabled" ]; then
+              echo "The KMS key with ID $key_id is enabled."
+            else
+              echo "The KMS key with ID $key_id is not in 'Enabled' status."
+            fi
             
             mkdir -p ~/tmp/outputs
-            echo ${KMS_KEY_ID} > ~/tmp/outputs/kms_key_id.txt
+            echo ${key_id} > ~/tmp/outputs/kms_key_id.txt
       - *persist-outputs
   prepare-env:
     executor: app-executor
@@ -109,9 +143,13 @@ jobs:
       - *restore-cache
       - *connect-to-aws
       - *attach-to-tmp
+      - *install-utils
       - run:
           name: Encrypt env variables and push them to AWS
+          shell: /bin/bash
           command: |
+            rm -rf .env.local
+            
             # Setup required variables for the scripts to run successfully
             export CLIENT=frontend
             export REGION=${AWS_DEFAULT_REGION}
@@ -122,6 +160,8 @@ jobs:
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
+            fetch_env
+
             # Change .env.local to match environment needs 
             PROPERTIES_TO_MODIFY="VITE_JWT_ACCESS_TOKEN_SECRET,VITE_APP_ENVIRONMENT,SERVER_URL"
             NEW_VALUES="${VITE_JWT_ACCESS_TOKEN_SECRET},${CIRCLE_BRANCH},${SERVER_URL}"
@@ -129,44 +169,6 @@ jobs:
 
             # Encrypt .env.local and push it to AWS
             package_and_encrypt_env
-
-  terraform-validate:
-    executor: terraform-executor
-    steps:
-      - checkout
-      - *show-current-branch-name
-      - run:
-          name: Terraform validate and format
-          command: |
-            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
-
-            terraform init -backend=false
-            terraform validate && terraform fmt
-  terraform-plan-and-apply:
-    executor: terraform-executor
-    steps:
-      - checkout
-      - *show-current-branch-name
-      - *attach-to-tmp
-      - run:
-          name: Terraform plan and apply
-          command: |
-            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
-
-            terraform init
-            terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH  
-            terraform plan
-      - run:
-          name: Terraform apply
-          command: |
-            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
-
-            terraform workspace select $CIRCLE_BRANCH
-            terraform apply -auto-approve
-
-            terraform output -raw cloudfront_distribution_id > ~/tmp/outputs/cloudfront_distribution_id.txt
-            terraform output -raw www_bucket_name > ~/tmp/outputs/www_bucket_name.txt
-      - *persist-outputs
   upload-build-to-s3:
     executor: app-executor
     steps:
@@ -174,12 +176,6 @@ jobs:
       - *connect-to-aws
       - *restore-cache
       - *attach-to-tmp
-      - run:
-          name: Build the project
-          command: |
-            # Prepare local files
-            rm -rf dist .env.local
-            pnpm run build
       - run:
           name: Download .env.local from AWS and decrypt
           command: |
@@ -190,27 +186,17 @@ jobs:
 
             . ~/tmp/scripts/env/utils.sh
             fetch_env
-
-            echo 'Downloaded .env.local from AWS'
-            cat .env.local
+      - run:
+          name: Build the project
+          command: |
+            # Prepare local files
+            rm -rf dist .env.local
+            pnpm run build
       - run:
           name: Upload build to S3
           command: |
             export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
-            aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://${S3_BUCKET_NAME}/${CIRCLE_BRANCH}/www --recursive
-  terraform-destroy:
-    executor: terraform-executor
-    steps:
-      - checkout
-      - *show-current-branch-name
-      - run:
-          name: Terraform destroy
-          command: |
-            cd .deploy/terraform/$CIRCLE_BRANCH/services/frontend
-
-            terraform init
-            terraform workspace select $CIRCLE_BRANCH || terraform workspace new $CIRCLE_BRANCH
-            terraform destroy -auto-approve
+            aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://${S3_BUCKET_NAME} --recursive
 
 workflows:
   build_and_deploy:
@@ -260,27 +246,10 @@ workflows:
               only:
                 - stage
                 - main
-      - terraform-validate:
-          requires:
-            - prepare-env
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
-      - terraform-plan-and-apply:
-          context: << pipeline.git.branch >>
-          requires:
-            - terraform-validate
-          filters:  
-            branches:
-              only:
-                - stage
-                - main
       - upload-build-to-s3:
           context: << pipeline.git.branch >>
           requires:
-            - terraform-plan-and-apply
+            - prepare-env
           filters:  
             branches:
               only:
