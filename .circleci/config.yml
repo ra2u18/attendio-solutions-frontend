@@ -83,7 +83,7 @@ jobs:
           name: Download utility scripts from AWS
           command: |
             echo 'Downloading utility scripts from AWS'
-            aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/backend/scripts ~/tmp/scripts --recursive
+            aws --region ${AWS_DEFAULT_REGION} s3 cp s3://${TMP_BUCKET_NAME}/scripts ~/tmp/scripts --recursive
       - *persist-scripts
   fetch-kms-key-id:
     executor: app-executor
@@ -147,7 +147,6 @@ jobs:
             export ENVIRONMENT=${CIRCLE_BRANCH}
             export ENV_KMS_KEY_ID=$(cat ~/tmp/outputs/kms_key_id.txt)
 
-            # Download utility scripts from AWS
             chmod +x ~/tmp/scripts/env/utils.sh
             . ~/tmp/scripts/env/utils.sh
 
