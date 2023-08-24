@@ -3,6 +3,8 @@ import axios from 'axios';
 export let BASE_ENDPOINT = '';
 const env = import.meta.env.VITE_APP_ENVIRONMENT;
 
+console.log('Environment stage is', env);
+
 // TODO: change the BASE_ENDPOINT to your backend domain
 if (env === 'local') {
   BASE_ENDPOINT = 'http://localhost:5000';
@@ -15,6 +17,8 @@ if (env === 'local') {
 }
 
 const BASE_URL = `${BASE_ENDPOINT}/api/v1`;
+
+console.log('Using the BASE_URL', BASE_URL);
 
 export default axios.create({ baseURL: BASE_URL });
 
