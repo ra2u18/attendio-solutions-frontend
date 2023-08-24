@@ -175,7 +175,7 @@ jobs:
           name: Download .env.local from AWS and decrypt
           command: |
             rm -rf .env.local
-            
+
             export CLIENT=frontend
             export REGION=${AWS_DEFAULT_REGION}
             export ENVIRONMENT=${CIRCLE_BRANCH}
@@ -192,8 +192,7 @@ jobs:
       - run:
           name: Upload build to S3
           command: |
-            export S3_BUCKET_NAME=$(cat ~/tmp/outputs/www_bucket_name.txt)
-            aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://${S3_BUCKET_NAME} --recursive
+            aws --region ${AWS_DEFAULT_REGION} s3 cp dist s3://asolutions-stage-www-bucket --recursive
 
 workflows:
   build_and_deploy:
