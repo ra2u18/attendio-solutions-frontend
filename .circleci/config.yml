@@ -186,11 +186,9 @@ jobs:
       - run:
           name: Build the project
           command: |
-            cat .env.local
-
-            # Prepare local files
-            rm -rf dist .env.local
+            rm -rf dist
             pnpm run build
+            rm -rf .env.local
       - run:
           name: Upload build to S3
           command: |
