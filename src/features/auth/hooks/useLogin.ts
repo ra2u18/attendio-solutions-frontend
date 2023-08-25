@@ -23,6 +23,8 @@ export const useLogin = () => {
     onSuccess: async (data: LoginUserOutput) => {
       const { accessToken, sessionId, role } = data;
 
+      console.log(accessToken, sessionId);
+
       // Set state
       setAccessToken(accessToken);
       setSessionId(sessionId);

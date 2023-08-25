@@ -16,7 +16,7 @@ if (env === 'local') {
   BASE_ENDPOINT = 'https://api.stage.attendiosolutions.online';
 }
 
-const BASE_URL = `https://api.stage.attendiosolutions.online/api/v1`;
+const BASE_URL = `${BASE_ENDPOINT}/api/v1`;
 
 console.log('Using the BASE_URL', BASE_URL);
 

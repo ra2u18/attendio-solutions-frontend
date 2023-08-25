@@ -5,7 +5,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 
 import { COOKIE_KEYS, CookieService } from '@/lib/cookies';
-import { verifyAccessToken } from '@/lib/jwt';
+import { verifyAccessToken } from '@/services/api/(auth)';
 import { axiosPrivate } from '@/services/api/axios';
 import { socketService } from '@/services/socket/socket.service';
 import { UserState } from '@/types/auth';
