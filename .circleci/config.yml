@@ -158,8 +158,8 @@ jobs:
             fetch_env
 
             # Change .env.local to match environment needs 
-            PROPERTIES_TO_MODIFY="VITE_JWT_ACCESS_TOKEN_SECRET,VITE_APP_ENVIRONMENT,SERVER_URL"
-            NEW_VALUES="${VITE_JWT_ACCESS_TOKEN_SECRET},${CIRCLE_BRANCH},${SERVER_URL}"
+            PROPERTIES_TO_MODIFY="VITE_APP_ENVIRONMENT"
+            NEW_VALUES="${CIRCLE_BRANCH}"
             modify_properties ${PROPERTIES_TO_MODIFY} ${NEW_VALUES}
 
             # Encrypt .env.local and push it to AWS
